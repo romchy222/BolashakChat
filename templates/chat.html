@@ -2,60 +2,121 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>BLACKBOXAI</title>
+  <title>Bolashak Chat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 </head>
-<body>
-  <header class="bbx-header">
-    <button class="bbx-menu">&#9776;</button>
-    <span class="bbx-logo">BLACKBOXAI</span>
-    <span class="bbx-dropdown">&#9662;</span>
-  </header>
-  <main>
-    <div class="bbx-content">
-      <h1 class="bbx-title">Ask Blackbox AI Anything</h1>
-      <div class="bbx-centerbox">
-        <div class="bbx-agent-select-row">
-          <select class="bbx-agent-select">
-            <option value="">Автоматический выбор агента</option>
-          </select>
+<body class="theme-light">
+  <!-- ваш HTML код -->
+  <nav class="navbar">
+    <div class="navbar-tags">
+      <span id="sidebar-toggle" class="material-symbols-outlined menu-icon" title="Открыть меню">
+        menu
+      </span>
+      <div class="model-selector-title" style="font-weight:600;font-size:15px;margin-bottom:3px;">BolashAI</div>
+      <div class="model-selector">
+        <div class="model-selector__current" id="modelSelectorCurrent">
+          <span class="model-selector__icon"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f916.svg" width="20" alt="GPT" /></span>
+          <span class="model-selector__label">Поступление</span>
+          <span class="model-selector__arrow">&#9662;</span>
         </div>
-        <div class="bbx-messages"></div>
-        <div class="bbx-chatbox">
-          <input type="text" class="bbx-input" placeholder="Message Blackbox or @mention agent" autocomplete="off">
-          <button class="bbx-send" type="button" title="Send"><span>&uarr;</span></button>
+        <div class="model-selector__dropdown" id="modelSelectorDropdown">
+          <input type="text" class="model-selector__search" placeholder="Search models..." id="modelSelectorSearch" autocomplete="off">
+          <ul class="model-selector__list" id="modelSelectorList">
+            <li data-value="admission" class="selected">
+              <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f916.svg" width="20" alt="GPT" />
+              Поступление
+            </li>
+            <li data-value="scholarship">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/OOjs_UI_icon_robot.svg" width="20" alt="Scholarship" />
+              Стипендия
+            </li>
+            <li data-value="general">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Font_Awesome_5_solid_brain.svg" width="20" alt="General" />
+              Общий
+            </li>
+          </ul>
         </div>
-        <div class="bbx-row bbx-tools">
-          <span class="bbx-tool"><span class="bbx-ico">&#127760;</span>Auto</span>
-          <span class="bbx-tool"><span class="bbx-ico">&#128241;</span>App Builder</span>
-          <span class="bbx-tool"><span class="bbx-ico">&#128230;</span>Deep Research</span>
-          <span class="bbx-tool"><span class="bbx-ico">&#9889;</span>Think</span>
-          <span class="bbx-tool"><span class="bbx-ico">&#128247;</span>Image Gen <span class="bbx-ico">&#9662;</span></span>
-          <span class="bbx-tool"><span class="bbx-ico">&#128206;</span>Upload</span>
-          <span class="bbx-tool"><span class="bbx-ico">+</span>Multi-Panel</span>
-          <span class="bbx-tool"><span class="bbx-ico">&#128269;</span>Select Models <span class="bbx-ico">&#9662;</span></span>
-        </div>
+        <!-- скрытый input для интеграции с формой -->
+        <input type="hidden" id="model-select" name="model-select" value="admission">
       </div>
+      <div class="bot-status" id="bot-status">
+        <span class="status-dot online"></span>
+        <span class="status-label">Offline</span>
+      </div>
+    </div> 
+    <div class="lang_theme">
+      <!-- свич языка -->
+      <div class="lang-dropdown">
+        <button class="lang-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M4.545 6.714 4.11 8H3l1.862-5h1.284L8 8H6.833l-.435-1.286zm1.634-.736L5.5 3.956h-.049l-.679 2.022z"/>
+            <path d="M0 2a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v3h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-3H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zm7.138 9.995q.289.451.63.846c-.748.575-1.673 1.001-2.768 1.292.178.217.451.635.555.867 1.125-.359 2.08-.844 2.886-1.494.777.665 1.739 1.165 2.93 1.472.133-.254.414-.673.629-.89-1.125-.253-2.057-.694-2.82-1.284.681-.747 1.222-1.651 1.621-2.757H14V8h-3v1.047h.765c-.318.844-.74 1.546-1.272 2.13a6 6 0 0 1-.415-.492 2 2 0 0 1-.94.31"/>
+          </svg>
+          Русский
+        </button>
+        <div class="lang-dropdown-content">
+          <a href="#ru"><img src="https://flagcdn.com/ru.svg" width="30" alt="Russia">Русский</a>
+          <a href="#kz"><img src="https://flagcdn.com/kz.svg" width="30" alt="Kazakhstan">Қазақша</a>
+          <a href="#en"><img src="https://flagcdn.com/us.svg" width="30" alt="United States">English</a>
+        </div>
+      </div> 
+      <!-- до сюда --> 
+      <button class="theme-toggle" title="Переключить тему"><span class="material-symbols-outlined">
+        light_mode
+        </span></button>
     </div>
+    
+  </nav>
+  <main class="main-content">
+    <div id="sidebar" class="sidebar">
+      <span id="close-sidebar" class="material-symbols-outlined close-btn" title="Закрыть меню">
+        close
+      </span>
+      <ul class="sidebar-menu">
+        <li><a href="#">Главная</a></li>
+        <li><a href="#">О нас</a></li>
+        <li><a href="#">Контакты</a></li>
+      </ul>
+    </div>
+
+    <div class="chat-card">
+      <div id="chat-history" class="chat-history"></div>
+      <div class="suggestions" id="suggestions">
+        <button>Как поступить?</button>
+        <button>Сроки подачи документов</button>
+        <button>Какие программы есть?</button>
+      </div>
+      <form id="chat-form" autocomplete="off" class="chat-input-panel">
+        <button type="button" id="voice-btn" class="voice-btn" title="Голосовой ввод">🎙️</button>
+        <input type="text" id="chat-input" placeholder="Введите сообщение..." autocomplete="off" />
+       
+        <button type="submit" class="send-btn" aria-label="Отправить">
+          <span>&uarr;</span>
+        </button>
+      </form>
+    </div>
+    <footer class="footer">
+    </footer>
   </main>
-  <footer class="bbx-footer">
-    <div class="bbx-bottom">
-      <span class="bbx-new">New</span>
-      <span class="bbx-bottom-text">Experience the power of BLACKBOX IDE - Code faster with AI Agents.</span>
-      <button class="bbx-download">Download</button>
-    </div>
-    <div class="bbx-socials">
-      <span>Follow us on</span>
-      <span class="bbx-soc">X</span>
-      <span class="bbx-soc">YouTube</span>
-      <span class="bbx-soc">&#9881;</span>
-    </div>
-    <div class="bbx-terms">
-      By using Blackbox you agree to the <u>Terms</u> and <u>Privacy</u>.
-    </div>
-  </footer>
   <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+  <script>
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const closeSidebar = document.getElementById('close-sidebar');
+
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+
+    closeSidebar.addEventListener('click', () => {
+      sidebar.classList.remove('active');
+    });
+  </script>
+
 </body>
 </html>
