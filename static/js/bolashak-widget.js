@@ -1440,7 +1440,7 @@
                             const response = await fetch(`${WIDGET_CONFIG.apiEndpoint}/api/chat`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json', },
-                                body: JSON.stringify({ message: text, language: this.language })
+                                body: JSON.stringify({ message: text, language: this.language, agent_type: 'admission' })
                             });
                             if (!response.ok) {
                                 let errText = 'Сервис временно недоступен. Попробуйте позже.';

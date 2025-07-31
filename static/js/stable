@@ -4,13 +4,13 @@
 const BOT_AVATAR = `<span class="bot-avatar" title="Bolashak AI">🧿</span>`;
 const TYPING_INDICATOR = `<span class="typing-indicator"><b>Бот печатает</b><span class="typing-dots"><span>.</span><span>.</span><span>.</span></span></span>`;
 const SUGGESTIONS = [
-  "Как поступить?",
-  "Сроки подачи документов",
-  "Какие программы есть?"
+  // "Как поступить?",
+  // "Сроки подачи документов",
+  // "Какие программы есть?"
 ];
 const LS_KEY = "bolashak_chat_history_v1";
 
-// ДАННЫЕ ДЛЯ КАСТОМНОГО СЕЛЕКТОРА
+// ДАННЫЕ ДЛЯ КАСТОМНОГО СЕЛЕКТОРА (вернулись к Поступление/Стипендия/Общий)
 const MODEL_OPTIONS = [
   {
     value: 'admission',
@@ -30,7 +30,7 @@ const MODEL_OPTIONS = [
 ];
 
 let currentLang = "ru";
-let currentModel = "admission";
+let currentModel = MODEL_OPTIONS[0].value;
 let recognizing = false;
 let recognition = null;
 
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const voiceBtn = document.getElementById('voice-btn');
   const botStatus = document.getElementById('bot-status');
 
-  // кастомный селектор
+  // кастомный селектор (Поступление/Стипендия/Общий)
   const modelSelectorCurrent = document.getElementById('modelSelectorCurrent');
   const modelSelectorDropdown = document.getElementById('modelSelectorDropdown');
   const modelSelectorList = document.getElementById('modelSelectorList');
@@ -80,33 +80,8 @@ document.addEventListener('DOMContentLoaded', function () {
     currentModel = selected.value;
   }
 
-  let messages = loadHistory();
-  renderAllMessages();
-
-  langBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      langBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentLang = btn.dataset.lang;
-      chatInput.placeholder = currentLang === "ru" ? "Введите сообщение..." :
-        currentLang === "kz" ? "Хабарлама енгізіңіз..." : "Type a message...";
-      renderSuggestions();
-    });
-  });
-
-  themeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('theme-dark');
-
-    if (document.body.classList.contains('theme-dark')) {
-      themeToggle.innerHTML = '<span class="material-symbols-outlined">brightness_4</span>';
-    } else {
-      themeToggle.innerHTML = '<span class="material-symbols-outlined">light_mode</span>';
-    }
-  });
-
-  // ======== КАСТОМНЫЙ СЕЛЕКТОР МОДЕЛИ ==========
+  // Toggle dropdown
   if (modelSelectorCurrent && modelSelectorDropdown && modelSelectorList && modelSelectorLabel && modelSelectorIcon && realModelInput) {
-    // Toggle dropdown
     modelSelectorCurrent.onclick = () => {
       modelSelectorDropdown.classList.toggle('active');
       if (modelSelectorDropdown.classList.contains('active')) {
@@ -145,6 +120,30 @@ document.addEventListener('DOMContentLoaded', function () {
     };
   }
   // ======== КАСТОМНЫЙ СЕЛЕКТОР END ==========
+
+  let messages = loadHistory();
+  renderAllMessages();
+
+  langBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      langBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentLang = btn.dataset.lang;
+      chatInput.placeholder = currentLang === "ru" ? "Введите сообщение..." :
+        currentLang === "kz" ? "Хабарлама енгізіңіз..." : "Type a message...";
+      renderSuggestions();
+    });
+  });
+
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('theme-dark');
+
+    if (document.body.classList.contains('theme-dark')) {
+      themeToggle.innerHTML = '<span class="material-symbols-outlined">brightness_4</span>';
+    } else {
+      themeToggle.innerHTML = '<span class="material-symbols-outlined">light_mode</span>';
+    }
+  });
 
   suggestionsDiv.addEventListener('click', e => {
     if (e.target.tagName === "BUTTON") {
@@ -196,8 +195,7 @@ document.addEventListener('DOMContentLoaded', function () {
     appendMessage({ text: message, who: "user", lang: currentLang, model: currentModel });
     chatInput.value = '';
     chatInput.disabled = true;
-    // modelSelect.disabled = true; // БОЛЬШЕ НЕ ТРЕБУЕТСЯ
-    document.querySelector('.model-selector__current').classList.add('disabled');
+    modelSelectorCurrent.classList.add('disabled');
     voiceBtn.disabled = true;
 
     suggestionsDiv.style.display = "none";
@@ -230,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function () {
       appendMessage({ text: "Ошибка соединения. Попробуйте ещё раз.", who: "bot", error: true });
     } finally {
       chatInput.disabled = false;
-      document.querySelector('.model-selector__current').classList.remove('disabled');
+      modelSelectorCurrent.classList.remove('disabled');
       voiceBtn.disabled = false;
       chatInput.focus();
     }
@@ -343,7 +341,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const speed = 17 + Math.random() * 20;
     const bubble = document.createElement('div');
     bubble.className = `chat-bubble bubble-bot`;
-    bubble.innerHTML = BOT_AVATAR + `<div class="message-content"></div><button class="copy-btn" title="Скопировать">⧉</button>`;
+    bubble.innerHTML = BOT_AVATAR + `<div class="message-content"></div><button class="copy-btn" title="Скопировать"><span class="material-symbols-outlined">
+content_copy
+</span></button>`;
     const content = bubble.querySelector('.message-content');
     chatHistory.appendChild(bubble);
     scrollDown(true);

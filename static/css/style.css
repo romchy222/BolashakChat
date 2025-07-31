@@ -567,3 +567,95 @@
     width: 1rem;
     height: 1rem;
 }
+.model-panel {
+  position: relative;
+  display: inline-block;
+}
+
+.model-panel-title {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background 0.18s;
+  user-select: none;
+}
+.model-panel-title:hover {
+  background: #f5f5f7;
+}
+.model-panel-arrow {
+  margin-left: 6px;
+  font-size: 1.1em;
+  color: #606060;
+}
+
+.model-panel-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;        /* Новое: строго под заголовком */
+  left: 0;
+  min-width: 240px;
+  background: #fff;
+  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.08), 0 1.5px 5px 0 rgba(0,0,0,0.03);
+  border-radius: 10px;
+  z-index: 20;
+  padding: 12px 0 8px 0;
+  margin-top: 6px;
+  animation: fadeIn 0.16s;
+}
+.model-panel-dropdown.active {
+  display: block;
+}
+
+.model-search {
+  width: 90%;
+  margin: 0 auto 10px auto;
+  display: block;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  background: #fafbfc;
+  outline: none;
+  font-size: 1em;
+  transition: border-color 0.15s;
+}
+.model-search:focus {
+  border-color: #b3b3b3;
+}
+
+.model-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.model-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 8px 16px;
+  font-size: 1em;
+  transition: background 0.13s;
+  border-radius: 6px;
+  min-width: 180px;
+}
+.model-list li.selected,
+.model-list li:hover {
+  background: #f1f3f7;
+}
+.model-list li img,
+.model-list li .model-icon img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  margin-right: 2px;
+  flex-shrink: 0;
+}
+/* Анимация появления */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px);}
+  to { opacity: 1; transform: translateY(0);}
+}

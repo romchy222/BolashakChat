@@ -1,0 +1,50 @@
+export const translations = {
+  ru: {
+    "nav.home": "Главная",
+    "nav.about": "О нас",
+    "nav.contacts": "Контакты",
+    "admission": "Поступление",
+    "scholarship": "Стипендия",
+    "questions": "Вопросы",
+    "answers": "Ответы",
+    "greetings": "Приветы",
+    "faq": "FAQ",
+    "general": "Общий",
+    "placeholder": "Введите сообщение...",
+    "lang.russian": "Русский",
+    "lang.kazakh": "Қазақша",
+    "lang.english": "English"
+  },
+  kz: {
+    "nav.home": "Басты бет",
+    "nav.about": "Біз туралы",
+    "nav.contacts": "Байланыс",
+    "admission": "Қабылдау",
+    "scholarship": "Стипендия",
+    "questions": "Сұрақтар",
+    "answers": "Жауаптар",
+    "greetings": "Сәлемдесу",
+    "faq": "Жиі сұрақтар",
+    "general": "Жалпы",
+    "placeholder": "Хабарлама жазыңыз...",
+    "lang.russian": "Орысша",
+    "lang.kazakh": "Қазақша",
+    "lang.english": "Ағылшынша"
+  },
+  en: {
+    "nav.home": "Home",
+    "nav.about": "About",
+    "nav.contacts": "Contacts",
+    "admission": "Admission",
+    "scholarship": "Scholarship",
+    "questions": "Questions",
+    "answers": "Answers",
+    "greetings": "Greetings",
+    "faq": "FAQ",
+    "general": "General",
+    "placeholder": "Enter your message...",
+    "lang.russian": "Russian",
+    "lang.kazakh": "Kazakh",
+    "lang.english": "English"
+  }
+};
