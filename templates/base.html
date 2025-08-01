@@ -10,6 +10,8 @@
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -17,24 +19,56 @@
     {% block head %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <i class="fas fa-graduation-cap me-2"></i>
-                Университет Болашак
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.index') }}">Главная</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('admin.login') }}">Администратор</a>
-                    </li>
-                </ul>
+    <nav class="nav-bar">
+        <div class="container-bar">
+            <div class="bolash-menu">
+                <div class="bolash-decor">
+                    <a class="univercity-brand-name" href="{{ url_for('main.index') }}">
+                        <i class="fas fa-graduation-cap me-2"></i>
+                        Университет Болашак
+                    </a>
+                    <a class="brand-ai" href="{{ url_for('main.index') }}">
+                        BolashAI - Легко и доступно<span class="model-panel-arrow"></span>
+                    </a>
+                </div>
+                    <!-- menu -->
+
+                <div class="menu-panel">
+                    <div class="menu-item">
+                        <span class="material-symbols-outlined">
+                            home
+                        </span><a class="univercity-brand" href="{{ url_for('main.index') }}">
+                                Главная
+                            </a>
+                    </div>
+                    <div class="menu-item">
+                        <span class="material-symbols-outlined">
+                            manage_accounts
+                        </span><a class="univercity-brand" href="{{ url_for('main.index') }}">
+                                Администратор
+                            </a>
+                    </div>
+                    <div class="menu-item">
+                        <span class="material-symbols-outlined">
+                            automation
+                        </span><a class="univercity-brand" href="{{ url_for('main.index') }}">
+                            BolashAI
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class= "navbar-switch-container">
+                <div class="switch-decor">
+                    <button class="navbar-switch" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="material-symbols-outlined">light_mode</span>
+                    </button>
+                </div>
+                <button class="navbar-switch" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="material-symbols-outlined">
+                    settings
+                    </span>
+                </button>
             </div>
         </div>
     </nav>

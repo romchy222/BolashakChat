@@ -29,22 +29,43 @@
             autocomplete="off"
           />
           <ul class="model-list" id="modelList">
-            <li data-value="admission" class="selected">
-              <span class="model-icon"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f916.svg" width="20" alt="" /></span>
-              <span data-i18n="admission">Поступление</span>
+            <li data-value="ai_assistant" class="selected">
+              <span class="model-icon"><span class="material-symbols-outlined">
+              book_3
+              </span></span>
+              <span>Abitur Bot</span>
               <span class="model-check">✔</span>
             </li>
-            <li data-value="scholarship">
-              <span class="model-icon"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f393.svg" width="20" alt="" /></span>
-              <span data-i18n="scholarship">Стипендия</span>
+            <li data-value="ai_navigator">
+              <span class="model-icon"><span class="material-symbols-outlined">
+              person_search
+              </span></span>
+              <span>Kadr AI</span>
               <span class="model-check">✔</span>
             </li>
-            <li data-value="general">
-              <span class="model-icon"><img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f9e0.svg" width="20" alt="" /></span>
-              <span data-i18n="general">Общий</span>
+            <li data-value="student_navigator">
+              <span class="model-icon"><span class="material-symbols-outlined">
+              school
+              </span></span>
+              <span>UniNav</span>
+              <span class="model-check">✔</span>
+            </li>
+            <li data-value="green_navigator">
+              <span class="model-icon"><span class="material-symbols-outlined">
+              enterprise
+              </span></span>
+              <span>Career Navigator</span>
+              <span class="model-check">✔</span>
+            </li>
+            <li data-value="communication">
+              <span class="model-icon"><span class="material-symbols-outlined">
+              apartment
+              </span></span>
+              <span>AI Agent</span>
               <span class="model-check">✔</span>
             </li>
           </ul>
+          <input type="hidden" id="selectedModel" name="selectedModel" value="ai_assistant"/>
         </div>
         <input type="hidden" id="selectedModel" name="selectedModel" value="admission"/>
       </div>
@@ -78,9 +99,15 @@
         </div>
       </div> 
       <ul class="sidebar-menu">
-        <li><a href="/" data-i18n="nav.home">Главная</a></li>
-        <li><a href="#" data-i18n="nav.about">О нас</a></li>
-        <li><a href="#" data-i18n="nav.contacts">Контакты</a></li>
+        <li><span class="material-symbols-outlined">
+          home
+          </span><a href="/" data-i18n="nav.home">Главная</a></li>
+        <li><span class="material-symbols-outlined">
+          bolt
+          </span><a href="#" data-i18n="nav.about">О нас</a></li>
+        <li><span class="material-symbols-outlined">
+          settings
+          </span><a href="#" data-i18n="nav.contacts">Контакты</a></li>
       </ul>
     </div>
     <div class="chat-card">
@@ -127,11 +154,11 @@
         </form>
       </div>
     </div>
-    <footer class="footer"></footer>
   </main>
   <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
   <script type="module" src="{{ url_for('static', filename='js/i18n.js') }}"></script>
   <script type="module" src="{{ url_for('static', filename='js/localization.js') }}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@16.1.1/lib/marked.umd.min.js"></script>
   <script>
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebar = document.getElementById('sidebar');

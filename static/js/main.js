@@ -3,7 +3,7 @@
 import { BOT_AVATAR, TYPING_INDICATOR, SUGGESTIONS, MODEL_OPTIONS } from './moduls/constants.js';
 import { saveHistory, loadHistory } from './moduls/storage.js';
 import { setupModelSelector } from './moduls/modelSelector.js';
-import { renderAllMessages, appendMessage, renderMessage, typeBotMessage, removeTyping, renderSuggestions } from './moduls/render.js';
+import { renderAllMessages, appendMessage, renderMessage, typeBotMessage, renderSuggestions, removeTyping } from './moduls/render.js';
 import { setupVoiceInput } from './moduls/voice.js';
 import { setupBotStatus } from './moduls/botStatus.js';
 

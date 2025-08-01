@@ -3,7 +3,7 @@
    ======================= */
 
 :root {
-    --primary-gradient: linear-gradient(135deg, #5567b1 0%, #3f5de1 100%);
+    --primary-gradient: #ffffff;
     --secondary-gradient: linear-gradient(135deg, #91a6ff 0%, #5778ff 100%);
     --primary-color: #4A6CF7;
     --secondary-color: #3B5BDB;
@@ -24,17 +24,141 @@
     --blur: blur(10px);
 }
 
+
+.nav-bar{
+    background: #ffffff;
+    display:flex;
+    height: 60px;
+    align-items: center;
+    border-bottom: 1px solid #d9d9d9;
+}
+.container-bar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 68%;
+    margin: auto;
+}
+
+.text-primary-two{
+    color: #ffffff !important;
+}
+
+.navbar-switch{
+    border:none;
+    display:flex;
+    align-items: center;
+    color: #414141;
+    background: none;
+}
+
+.navbar-switch:hover{
+    transform:scale(1.05);
+    transform:rotate(180deg);
+    transition: 0.3s ease-in-out;
+}
+
+.bolash-decor{
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #b1b1b1;
+    padding: 0px 15px 0px 5px;
+    align-items: flex-end;
+}
+
+.menu-panel{
+    display:flex;
+    flex-direction: row;
+    gap: 0px;
+    padding: 8px;
+    border-radius: 6px;
+}
+.menu-item{
+    display: flex;
+    cursor: pointer;
+    gap: 7px;
+    transition: 0.2s ease-in-out;
+    padding: 2px 10px 2px 8px;
+    /* background: #007fff; */
+    border-radius: 16px;
+    margin: 0px 10px 0px 0px;
+    align-items: center;
+}
+
+.menu-item:hover{
+    transform: scale(1.1);
+    transition: 0.2s ease-in-out;
+}
+
+.bolash-menu{
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 16px;
+    color: #353535;
+    text-decoration: none;
+    font-weight: 500
+}
+
+.brand-ai{
+    font-size: 12px;
+    color: #353535;
+    text-decoration: none;
+    font-weight: 400
+}
+
+.navbar-switch-container{
+    display: flex;
+    border-radius: 20px;
+    padding: 2px;
+    background: #ffffff;
+}
+
+.univercity-brand{
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    color: #3b3b3b;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.univercity-brand-name{
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    color: #303030;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.switch-decor{
+    border-right: 1px solid #b1b1b1;
+}
+
+.bolashak-text{
+    font-size: 55px;
+    color: #1e1e1e;
+}
+
+.text-bolash{
+    color: #1e1e1e;
+    font-weight: 300;
+    padding: 5px 0px 5px 0px;
+    font-size: 19px;
+}
+
 .text-primary{
-    color: var(--color-text-light) !important;
+    color: #1e1e1e !important;
 }
 
 /* =======================
    Hero section
    ======================= */
 .hero-section {
-    background: var(--primary-gradient);
     min-height: 100vh;
     color: var(--color-text-light);
+    background: #f9f9f9;
 }
 
 /* =======================
@@ -42,6 +166,7 @@
    ======================= */
 .feature-item {
     display: flex;
+    color: #1e1e1e;
     align-items: center;
     gap: 0.5rem;
     background: var(--feature-bg);
@@ -49,6 +174,12 @@
     border-radius: 5px;
     backdrop-filter: var(--blur);
     box-shadow: -6px 7px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.feature-item:hover{
+    transform: scale(1.05);
+    transition: 0.3s ease-in-out;
 }
 
 /* =======================
@@ -71,12 +202,12 @@
 .stat-number {
     font-size: 1.5rem;
     font-weight: bold;
-    color: var(--color-blue);
+    color: #007fff;
 }
 
 .stat-label {
     font-size: 0.875rem;
-    color: var(--color-gray);
+    color: #ffffff;
 }
 
 /* =======================
@@ -137,7 +268,7 @@
 }
 
 .option-style{
-    
+
 }
 
 
@@ -534,9 +665,21 @@
     color: black !important;
 }
 .btn-primary {
-    background: linear-gradient(135deg, #5371e9 0%, #4463ee 100%);
+    background: #007fff;
     border: none;
+    box-shadow: 0 -200px 100px -120px #c94df1 inset;
+    animation: backgr 3s infinite alternate;
 }
+
+@keyframes backgr{
+    50% {
+        background: skyblue;
+        box-shadow: 0 -200px 100px -100px #3253cd inset;
+        transform: translateY(-6px);
+        
+      }
+}
+
 .btn-primary:hover {
     background: linear-gradient(135deg, #7391d9 0%, #364cb0 100%);
     transform: translateY(-1px);
@@ -546,6 +689,7 @@
    Карточки
    ======================= */
 .card {
+    background: #465565 !important;
     border-radius: 10px;
     border: none;
     box-shadow: -10px 15px 0px rgba(0, 0, 0, 0.1);

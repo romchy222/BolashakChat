@@ -2,6 +2,8 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Dict, Any, List
 
+from mistral_client import MistralClient
+
 logger = logging.getLogger(__name__)
 
 class AgentType:
@@ -12,10 +14,11 @@ class AgentType:
     COMMUNICATION = "communication"
 
 class BaseAgent(ABC):
-    def __init__(self, agent_type: str, name: str, description: str):
+    def __init__(self, agent_type: str, name: str, description: str, mistral_client: MistralClient):
         self.agent_type = agent_type
         self.name = name
         self.description = description
+        self.mistral = mistral_client
 
     @abstractmethod
     def can_handle(self, message: str, language: str = "ru") -> float:
@@ -27,8 +30,9 @@ class BaseAgent(ABC):
 
     def process_message(self, message: str, language: str = "ru") -> Dict[str, Any]:
         try:
-            # Здесь должна быть интеграция с LLM или внешним сервисом
-            response = f"{self.name} обработал ваше сообщение: {message}"
+            # Можно добавить получение контекста из базы FAQ или другой логики
+            context = ""
+            response = self.mistral.get_response(message, context, language)
             return {
                 'response': response,
                 'confidence': self.can_handle(message, language),
@@ -45,11 +49,12 @@ class BaseAgent(ABC):
             }
 
 class AIAssistantAgent(BaseAgent):
-    def __init__(self):
+    def __init__(self, mistral_client: MistralClient):
         super().__init__(
             AgentType.AI_ASSISTANT,
             "AI-Assistant",
-            "Универсальный цифровой ассистент: обучение, расписание, сервисы университета"
+            "Универсальный цифровой ассистент: обучение, расписание, сервисы университета",
+            mistral_client
         )
 
     def can_handle(self, message: str, language: str = "ru") -> float:
@@ -60,11 +65,12 @@ class AIAssistantAgent(BaseAgent):
         return "Вы универсальный ассистент для студентов и сотрудников университета 'Болашак'."
 
 class AINavigatorAgent(BaseAgent):
-    def __init__(self):
+    def __init__(self, mistral_client: MistralClient):
         super().__init__(
             AgentType.AI_NAVIGATOR,
             "AI-Навигатор",
-            "Карьерный навигатор и профориентация для студентов и сотрудников"
+            "Карьерный навигатор и профориентация для студентов и сотрудников",
+            mistral_client
         )
 
     def can_handle(self, message: str, language: str = "ru") -> float:
@@ -75,11 +81,12 @@ class AINavigatorAgent(BaseAgent):
         return "Вы интеллектуальный карьерный навигатор для студентов и сотрудников."
 
 class StudentNavigatorAgent(BaseAgent):
-    def __init__(self):
+    def __init__(self, mistral_client: MistralClient):
         super().__init__(
             AgentType.STUDENT_NAVIGATOR,
             "Студенческий навигатор",
-            "Цифровая платформа для административных и образовательных процедур"
+            "Цифровая платформа для административных и образовательных процедур",
+            mistral_client
         )
 
     def can_handle(self, message: str, language: str = "ru") -> float:
@@ -90,11 +97,12 @@ class StudentNavigatorAgent(BaseAgent):
         return "Вы цифровой навигатор по административным и образовательным процедурам университета."
 
 class GreenNavigatorAgent(BaseAgent):
-    def __init__(self):
+    def __init__(self, mistral_client: MistralClient):
         super().__init__(
             AgentType.GREEN_NAVIGATOR,
             "GreenNavigator",
-            "Помощник по поиску работы и стажировок для студентов и выпускников"
+            "Помощник по поиску работы и стажировок для студентов и выпускников",
+            mistral_client
         )
 
     def can_handle(self, message: str, language: str = "ru") -> float:
@@ -105,11 +113,12 @@ class GreenNavigatorAgent(BaseAgent):
         return "Вы цифровой помощник по поиску работы и стажировок для студентов и выпускников."
 
 class CommunicationAgent(BaseAgent):
-    def __init__(self):
+    def __init__(self, mistral_client: MistralClient):
         super().__init__(
             AgentType.COMMUNICATION,
             "Агент по вопросам общения",
-            "Платформа для обратной связи и коммуникаций"
+            "Платформа для обратной связи и коммуникаций",
+            mistral_client
         )
 
     def can_handle(self, message: str, language: str = "ru") -> float:
@@ -121,12 +130,13 @@ class CommunicationAgent(BaseAgent):
 
 class AgentRouter:
     def __init__(self):
+        self.mistral = MistralClient()
         self.agents = [
-            AIAssistantAgent(),
-            AINavigatorAgent(),
-            StudentNavigatorAgent(),
-            GreenNavigatorAgent(),
-            CommunicationAgent()
+            AIAssistantAgent(self.mistral),
+            AINavigatorAgent(self.mistral),
+            StudentNavigatorAgent(self.mistral),
+            GreenNavigatorAgent(self.mistral),
+            CommunicationAgent(self.mistral)
         ]
         logger.info(f"AgentRouter initialized with {len(self.agents)} agents")
 

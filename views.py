@@ -64,12 +64,12 @@ def chat():
             if agent_type:
                 # Поиск агента с нужным типом
                 for agent in router.agents:
-                    if getattr(agent, "agent_type", None) and (agent.agent_type.value == agent_type):
-                        result = agent.process_message(user_message, language)
-                        result['agent_type'] = agent.agent_type.value
-                        result['agent_name'] = agent.name
-                        result['confidence'] = 1.0
-                        break
+                        if getattr(agent, "agent_type", None) and (agent.agent_type == agent_type):
+                            result = agent.process_message(user_message, language)
+                            result['agent_type'] = agent.agent_type
+                            result['agent_name'] = agent.name
+                            result['confidence'] = 1.0
+                            break
                 else:
                     # Если не найден — fallback на авто-выбор
                     result = router.route_message(user_message, language)
