@@ -3,6 +3,8 @@
    ======================= */
 
 :root {
+    --cb-border-color: #dbdbdb;
+    --cb-blue: #f5f5f5;
     --text-wb: #0077ff;
     --card-color: #363a5d;
     --border-color: #dbdbdb;
@@ -28,6 +30,8 @@
 }
 
 body.theme-dark {
+    --cb-border-color: #949494;
+    --cb-blue: #477bff;
     --text-wb: #0048ff;
     --card-color: #1c2333;
     --border-color: #272727;
@@ -199,6 +203,48 @@ body.theme-dark {
     color: var(--bg-light) !important;
 }
 
+/* class cb, statistics */
+
+.cb{
+    margin: 0px 0 20px 0;
+    border-radius: 17px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+}
+.cb-stats{
+    gap: 8px;
+    padding: 20px;
+    color: var(--bg-light);
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.cb-text{
+    font-size: 14px;
+    color: var(--bg-light);
+}
+
+.cb-list{
+    list-style-type: none !important;
+    width: 100%;
+    border-radius: 10px;
+    background: var(--bg-dark);
+    padding: 10px 0px 10px 20px;
+}
+
+.cb-list-item{
+    color: var(--bg-light);
+    font-size: 14px;
+    margin: 10px 20px 20px 0;
+    background: var(--bg-dark);
+    border: 1px solid var(--cb-border-color);
+    border-radius: 9px;
+    padding: 20px;
+tranform(rotate(
+    FONT-VARIANT: JIS04));
+}
+
 /* =======================
    Hero section
    ======================= */
@@ -212,6 +258,13 @@ body.theme-dark {
 }
 .hero-section .container {
     width: 100%;
+}
+
+.min-vh-100{
+    min-height: 50vh!important;
+}
+.align-items-center{
+    align-items: center !important;
 }
 
 /* =======================
@@ -323,6 +376,7 @@ body.theme-dark {
         width: 100%;
         max-width: 100%;
         flex: unset;
+        margin-bottom: 20px;
     }
     .nav-bar {
         height: auto;
@@ -547,6 +601,9 @@ body.theme-dark {
 @media (max-width: 1024px) {
     .nav-bar {
         display: none !important;
+    }
+    .cb{
+        margin:16px;
     }
     .mobile-burger {
         display: flex !important;
