@@ -49,7 +49,7 @@ body.theme-dark {
     --color-text-light: #fff;
     --color-border: #E5E7EB;
     --color-muted: #9CA3AF;
-    --color-blue: #007bff;
+    --color-blue: #4b4d4f;
     --color-gray: #6c757d;
     --stat-bg: rgba(255, 255, 255, 0.05);
     --feature-bg: rgba(255, 255, 255, 0.1);
@@ -230,6 +230,7 @@ body.theme-dark {
     width: 100%;
     border-radius: 10px;
     background: var(--bg-dark);
+    width: 50%;
     padding: 10px 0px 10px 20px;
 }
 
@@ -241,12 +242,29 @@ body.theme-dark {
     border: 1px solid var(--cb-border-color);
     border-radius: 9px;
     padding: 20px;
-tranform(rotate(
-    FONT-VARIANT: JIS04));
     gap: 10px;
     display: flex;
     align-items: center;
 }
+
+.bg-check{
+    background: var(--color-blue);
+    border-radius: 50%;
+    padding: 5px;
+    color: white;
+    font-size: 18px;
+}
+
+.decor-2{
+  display:flex;
+
+}
+
+.cb-photo{
+    
+}
+
+
 
 /* =======================
    Hero section
@@ -264,7 +282,7 @@ tranform(rotate(
 }
 
 .min-vh-100{
-    min-height: 50vh!important;
+    min-height: 60vh!important;
 }
 .align-items-center{
     align-items: center !important;
