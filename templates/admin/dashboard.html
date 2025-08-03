@@ -16,65 +16,41 @@
         </a>
     </div>
 
-    <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4>{{ total_queries or 0 }}</h4>
-                            <p class="mb-0">Всего запросов</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-comments fa-2x"></i>
-                        </div>
-                    </div>
+    <!-- Statistics Cards (Unified Style) -->
+    <div class="row mb-4 g-3">
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 h-100 bg-gradient-primary text-white">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-comments fa-2x mb-2"></i>
+                    <h4 class="fw-bold mb-1">{{ total_queries or 0 }}</h4>
+                    <div class="small">Всего запросов</div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4>{{ total_faqs or 0 }}</h4>
-                            <p class="mb-0">Активных FAQ</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-question-circle fa-2x"></i>
-                        </div>
-                    </div>
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 h-100 bg-gradient-success text-white">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-question-circle fa-2x mb-2"></i>
+                    <h4 class="fw-bold mb-1">{{ total_faqs or 0 }}</h4>
+                    <div class="small">Активных FAQ</div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-dark">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4>{{ total_categories or 0 }}</h4>
-                            <p class="mb-0">Категорий</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-folder fa-2x"></i>
-                        </div>
-                    </div>
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 h-100 bg-gradient-warning text-dark">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-folder fa-2x mb-2"></i>
+                    <h4 class="fw-bold mb-1">{{ total_categories or 0 }}</h4>
+                    <div class="small">Категорий</div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4>{{ avg_response_time or 0 }}s</h4>
-                            <p class="mb-0">Среднее время ответа</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-clock fa-2x"></i>
-                        </div>
-                    </div>
+        <div class="col-6 col-md-3">
+            <div class="card shadow-sm border-0 h-100 bg-gradient-info text-white">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-clock fa-2x mb-2"></i>
+                    <h4 class="fw-bold mb-1">{{ avg_response_time or 0 }}s</h4>
+                    <div class="small">Среднее время ответа</div>
                 </div>
             </div>
         </div>
@@ -142,50 +118,32 @@
         </div>
     </div>
 
-    <!-- Knowledge Base Statistics -->
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card bg-secondary text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4>{{ total_documents or 0 }}</h4>
-                            <p class="mb-0">Документов загружено</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-file-text fa-2x"></i>
-                        </div>
-                    </div>
+    <!-- Knowledge Base Statistics (Unified Style) -->
+    <div class="row mb-4 g-3">
+        <div class="col-12 col-md-4">
+            <div class="card shadow-sm border-0 h-100 bg-gradient-secondary text-white">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-file-text fa-2x mb-2"></i>
+                    <h4 class="fw-bold mb-1">{{ total_documents or 0 }}</h4>
+                    <div class="small">Документов загружено</div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card bg-dark text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4>{{ total_web_sources or 0 }}</h4>
-                            <p class="mb-0">Веб-источников</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-globe fa-2x"></i>
-                        </div>
-                    </div>
+        <div class="col-12 col-md-4">
+            <div class="card shadow-sm border-0 h-100 bg-gradient-dark text-white">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-globe fa-2x mb-2"></i>
+                    <h4 class="fw-bold mb-1">{{ total_web_sources or 0 }}</h4>
+                    <div class="small">Веб-источников</div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card bg-light text-dark">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4>{{ total_kb_chunks or 0 }}</h4>
-                            <p class="mb-0">Фрагментов в базе знаний</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-database fa-2x"></i>
-                        </div>
-                    </div>
+        <div class="col-12 col-md-4">
+            <div class="card shadow-sm border-0 h-100 bg-gradient-light text-dark">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-database fa-2x mb-2"></i>
+                    <h4 class="fw-bold mb-1">{{ total_kb_chunks or 0 }}</h4>
+                    <div class="small">Фрагментов в базе знаний</div>
                 </div>
             </div>
         </div>
@@ -330,17 +288,17 @@ async function loadAgentAnalytics() {
             fetch('/admin/api/analytics/agents'),
             fetch('/admin/api/analytics/summary')
         ]);
-        
+
         const analyticsData = await analyticsResponse.json();
         const summaryData = await summaryResponse.json();
-        
+
         // Create charts
         createAgentUsageChart(summaryData.agent_totals);
         createLanguageChart(analyticsData.language_stats);
         createResponseTimeChart(analyticsData.agent_stats);
         createSuccessRateChart(summaryData.success_rates);
         createDailyUsageChart(analyticsData.daily_stats);
-        
+
     } catch (error) {
         console.error('Error loading analytics:', error);
     }
@@ -350,7 +308,7 @@ async function loadAgentAnalytics() {
 function createAgentUsageChart(data) {
     const ctx = document.getElementById('agentUsageChart').getContext('2d');
     const colors = Object.values(chartColors);
-    
+
     new Chart(ctx, {
         type: 'pie',
         data: {
@@ -386,13 +344,13 @@ function createAgentUsageChart(data) {
 // Language Distribution Chart
 function createLanguageChart(data) {
     const ctx = document.getElementById('languageChart').getContext('2d');
-    
+
     // Aggregate by language
     const languageData = data.reduce((acc, item) => {
         acc[item.language] = (acc[item.language] || 0) + item.count;
         return acc;
     }, {});
-    
+
     new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -419,7 +377,7 @@ function createLanguageChart(data) {
 // Response Time Bar Chart
 function createResponseTimeChart(data) {
     const ctx = document.getElementById('responseTimeChart').getContext('2d');
-    
+
     new Chart(ctx, {
         type: 'bar',
         data: {
@@ -456,7 +414,7 @@ function createResponseTimeChart(data) {
 // Success Rate Chart
 function createSuccessRateChart(data) {
     const ctx = document.getElementById('successRateChart').getContext('2d');
-    
+
     new Chart(ctx, {
         type: 'bar',
         data: {
@@ -496,17 +454,17 @@ function createSuccessRateChart(data) {
 // Daily Usage Line Chart
 function createDailyUsageChart(data) {
     const ctx = document.getElementById('dailyUsageChart').getContext('2d');
-    
+
     // Group data by agent type
     const agentTypes = [...new Set(data.map(item => item.agent_type))];
     const dates = [...new Set(data.map(item => item.date))].sort();
-    
+
     const datasets = agentTypes.map((agentType, index) => {
         const agentData = dates.map(date => {
             const item = data.find(d => d.date === date && d.agent_type === agentType);
             return item ? item.count : 0;
         });
-        
+
         return {
             label: agentType || 'Неизвестный',
             data: agentData,
@@ -516,7 +474,7 @@ function createDailyUsageChart(data) {
             fill: false
         };
     });
-    
+
     new Chart(ctx, {
         type: 'line',
         data: {

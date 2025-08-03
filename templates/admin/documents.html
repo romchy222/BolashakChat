@@ -29,7 +29,12 @@
                                 <p class="text-muted mb-2">
                                     <i class="fas fa-file me-1"></i>{{ document.filename }}
                                     <span class="ms-3">
-                                        <i class="fas fa-hdd me-1"></i>{{ "%.1f"|format(document.file_size / 1024) }} KB
+                                        <i class="fas fa-hdd me-1"></i>
+                                        {% if document.file_size is not none %}
+                                            {{ "%.1f"|format(document.file_size / 1024) }} KB
+                                        {% else %}
+                                            -
+                                        {% endif %}
                                     </span>
                                 </p>
                                 <p class="mb-2">
@@ -83,7 +88,7 @@
                                 <a class="page-link" href="{{ url_for('admin.documents', page=documents.prev_num) }}">Предыдущая</a>
                             </li>
                         {% endif %}
-                        
+
                         {% for page_num in documents.iter_pages() %}
                             {% if page_num %}
                                 {% if page_num != documents.page %}
@@ -101,7 +106,7 @@
                                 </li>
                             {% endif %}
                         {% endfor %}
-                        
+
                         {% if documents.has_next %}
                             <li class="page-item">
                                 <a class="page-link" href="{{ url_for('admin.documents', page=documents.next_num) }}">Следующая</a>
