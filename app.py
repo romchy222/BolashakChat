@@ -31,7 +31,9 @@ def create_app():
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
     # Настройка базы данных
-    database_url = os.environ.get("DATABASE_URL", "sqlite:///bolashakbot.db")
+    database_url = os.environ.get("DATABASE_URL")
+    if not database_url or database_url.strip() == "":
+        database_url = "sqlite:///bolashakbot.db"
     app.config["SQLALCHEMY_DATABASE_URI"] = database_url
     # Настройки движка базы данных
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {

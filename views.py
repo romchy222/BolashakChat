@@ -113,7 +113,9 @@ def chat():
 
     except Exception as e:
         logger.error(f"Error in chat endpoint: {str(e)}")
-        error_message = "Извините, произошла ошибка. Попробуйте еще раз." if language == 'ru' else "Кешіріңіз, қате орын алды. Қайталап көріңіз."
+        # Use a default language if language is not defined
+        lang = locals().get('language', 'ru')
+        error_message = "Извините, произошла ошибка. Попробуйте еще раз." if lang == 'ru' else "Кешіріңіз, қате орын алды. Қайталап көріңіз."
         return jsonify({'error': error_message}), 500
         
 @main_bp.route('/api/health')
@@ -210,7 +212,7 @@ def deployment_readiness():
         try:
             import flask, sqlalchemy, gunicorn, requests
             checks['dependencies']['status'] = 'healthy'
-            checks['dependencies']['message'] = f'Python {sys.version.split()[0]}, Flask {flask.__version__}'
+            checks['dependencies']['message'] = f'Python {sys.version.split()[0]}, Flask {getattr(flask, "__version__", "unknown")}'
         except ImportError as e:
             checks['dependencies']['status'] = 'error'
             checks['dependencies']['message'] = f'Отсутствуют зависимости: {str(e)}'
