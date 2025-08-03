@@ -243,6 +243,9 @@ body.theme-dark {
     padding: 20px;
 tranform(rotate(
     FONT-VARIANT: JIS04));
+    gap: 10px;
+    display: flex;
+    align-items: center;
 }
 
 /* =======================
