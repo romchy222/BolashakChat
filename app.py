@@ -30,10 +30,13 @@ def create_app():
     # Настройка ProxyFix для работы за прокси
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
-    # Настройка базы данных
+    # Настройка базы данных - принудительно используем SQLite для стабильности
     database_url = os.environ.get("DATABASE_URL")
-    if not database_url or database_url.strip() == "":
+    if not database_url or database_url.strip() == "" or "neon.tech" in database_url:
         database_url = "sqlite:///bolashakbot.db"
+        logging.info("Using SQLite database: bolashakbot.db")
+    else:
+        logging.info(f"Using database: {database_url}")
     app.config["SQLALCHEMY_DATABASE_URI"] = database_url
     # Настройки движка базы данных
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
