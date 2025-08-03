@@ -39,6 +39,32 @@ def widget_demo():
     return render_template('widget-demo.html')
 
 
+@main_bp.route('/health')
+def health_check():
+    """Health check endpoint for deployment monitoring"""
+    try:
+        from app import db
+        from sqlalchemy import text
+        
+        # Test database connection
+        with db.engine.connect() as conn:
+            conn.execute(text('SELECT 1'))
+        
+        return jsonify({
+            'status': 'healthy',
+            'timestamp': time.time(),
+            'database': 'connected'
+        }), 200
+    except Exception as e:
+        logger.error(f"Health check failed: {str(e)}")
+        return jsonify({
+            'status': 'unhealthy',
+            'timestamp': time.time(),
+            'database': 'disconnected',
+            'error': str(e)
+        }), 500
+
+
 @main_bp.route('/api/chat', methods=['POST'])
 def chat():
     try:
@@ -115,11 +141,6 @@ def chat():
         logger.error(f"Error in chat endpoint: {str(e)}")
         error_message = "Извините, произошла ошибка. Попробуйте еще раз." if language == 'ru' else "Кешіріңіз, қате орын алды. Қайталап көріңіз."
         return jsonify({'error': error_message}), 500
-        
-@main_bp.route('/api/health')
-def health_check():
-    """Health check endpoint"""
-    return jsonify({'status': 'healthy', 'timestamp': time.time()})
 
 
 @main_bp.route('/api/agents')

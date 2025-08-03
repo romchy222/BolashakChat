@@ -10,10 +10,13 @@ instance/
 
 # Environment variables
 .env
+.env.*
+!.env.example
 
 # Virtual environment
 venv/
 env/
+ENV/
 
 # IDE files
 .vscode/
@@ -29,3 +32,34 @@ Thumbs.db
 uploads/*
 !uploads/.gitkeep
 tmp/
+temp/
+.tmp
+
+# Logs
+logs/
+*.log
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+test_results/
+
+# Build and distribution
+build/
+dist/
+*.egg-info/
+
+# Lock files
+uv.lock
+
+# SSL certificates
+ssl/
+*.pem
+*.key
+*.crt
+
+# Backup files
+*.backup
+*.bak
+backup_*

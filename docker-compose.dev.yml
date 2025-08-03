@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=true
+      - DATABASE_URL=sqlite:///bolashakbot.db
+      - SESSION_SECRET=dev-secret-key-change-in-production
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - .:/app
+      - uploads_data:/app/uploads
+    restart: unless-stopped
+    command: ["python", "app.py"]
+
+volumes:
+  uploads_data:

@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=postgresql://bolashak:bolashak_password@db:5432/bolashakbot
+      - SESSION_SECRET=${SESSION_SECRET:-your-super-secret-session-key-here}
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY}
+      - SESSION_COOKIE_SECURE=true
+      - LOG_LEVEL=INFO
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - uploads_data:/app/uploads
+      - logs_data:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=bolashakbot
+      - POSTGRES_USER=bolashak
+      - POSTGRES_PASSWORD=bolashak_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bolashak -d bolashakbot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl  # SSL certificates
+    depends_on:
+      - app
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  uploads_data:
+  logs_data:

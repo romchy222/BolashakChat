@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
+from config import get_config, setup_logging
 
 # Настройка логирования
 logging.basicConfig(level=logging.DEBUG)
@@ -24,21 +25,24 @@ def create_app():
     """Функция создания и настройки Flask приложения"""
     # Создание экземпляра Flask приложения
     app = Flask(__name__)
-    # Установка секретного ключа для сессий
-    app.secret_key = os.environ.get("SESSION_SECRET",
-                                    "dev-secret-key-change-in-production")
+    
+    # Загрузка конфигурации
+    config_class = get_config()
+    app.config.from_object(config_class)
+    
+    # Установка секретного ключа для сессий с проверкой безопасности
+    secret_key = os.environ.get("SESSION_SECRET")
+    if not secret_key:
+        if os.environ.get("FLASK_ENV") == "production":
+            raise ValueError("SESSION_SECRET must be set in production environment")
+        secret_key = "dev-secret-key-change-in-production"
+    app.secret_key = secret_key
+    
     # Настройка ProxyFix для работы за прокси
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
-    # Настройка базы данных
-    database_url = os.environ.get("DATABASE_URL", "sqlite:///bolashakbot.db")
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
-    # Настройки движка базы данных
-    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-        "pool_recycle": 300,  # Переподключение каждые 5 минут
-        "pool_pre_ping": True,  # Проверка соединения перед использованием
-    }
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    # Настройка логирования
+    setup_logging(app)
 
     # Инициализация базы данных с приложением
     db.init_app(app)
@@ -88,6 +92,9 @@ def create_app():
 # Создание экземпляра приложения
 app = create_app()
 
-# Запуск приложения в режиме разработки
+# Запуск приложения
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # Используем переменную окружения для debug режима
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=debug_mode)

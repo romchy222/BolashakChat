@@ -1,0 +1,88 @@
+# Git
+.git
+.gitignore
+.github
+
+# Documentation
+README.md
+README-MultiAgent.md
+DEPLOYMENT.md
+docs/
+replit.md
+
+# Environment and config
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+*.sqlite
+instance/
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+.tmp
+
+# Test files
+test_*.py
+*_test.py
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Uploads (will be handled by volumes)
+uploads/*
+!uploads/.gitkeep
+
+# Lock files that might be platform specific
+uv.lock

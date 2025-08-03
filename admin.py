@@ -55,25 +55,74 @@ def upload_document():
     try:
         from models import Document
         from app import db
+        
         file = request.files.get('file')
         logger.info("[UPLOAD] Получен запрос на загрузку документа")
+        
         if not file or file.filename == '':
             logger.warning("[UPLOAD] Файл не выбран")
             flash('Файл не выбран', 'error')
             return redirect(url_for('admin.documents'))
+        
+        # Валидация файла
         filename = secure_filename(file.filename)
+        if not filename:
+            flash('Недопустимое имя файла', 'error')
+            return redirect(url_for('admin.documents'))
+        
+        # Проверка расширения файла
+        allowed_extensions = {'txt', 'pdf', 'doc', 'docx', 'html'}
+        file_ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
+        if file_ext not in allowed_extensions:
+            flash(f'Недопустимый тип файла. Разрешены: {", ".join(allowed_extensions)}', 'error')
+            return redirect(url_for('admin.documents'))
+        
+        # Проверка размера файла (максимум 16 MB)
+        max_file_size = 16 * 1024 * 1024  # 16 MB
+        file.seek(0, 2)  # Перейти в конец файла
+        file_size = file.tell()
+        file.seek(0)  # Вернуться в начало
+        
+        if file_size > max_file_size:
+            flash('Файл слишком большой (максимум 16 МБ)', 'error')
+            return redirect(url_for('admin.documents'))
+        
+        # Проверка MIME типа
+        file_type = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+        allowed_mime_types = {
+            'text/plain', 'application/pdf', 'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'text/html'
+        }
+        
+        if file_type not in allowed_mime_types:
+            flash('Недопустимый MIME тип файла', 'error')
+            return redirect(url_for('admin.documents'))
+        
         upload_folder = 'uploads'
         os.makedirs(upload_folder, exist_ok=True)
         file_path = os.path.join(upload_folder, filename)
+        
+        # Проверка на перезапись существующего файла
+        if os.path.exists(file_path):
+            base_name, ext = os.path.splitext(filename)
+            counter = 1
+            while os.path.exists(file_path):
+                new_filename = f"{base_name}_{counter}{ext}"
+                file_path = os.path.join(upload_folder, new_filename)
+                counter += 1
+            filename = os.path.basename(file_path)
+        
         file.save(file_path)
         logger.info(f"[UPLOAD] Файл сохранён: {file_path}")
-        file_type = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+        
         file_type = file_type[:50]
         admin_id = session.get('admin_id')
         if not admin_id:
             logger.warning("[UPLOAD] Не найден admin_id в сессии")
             flash('Ошибка авторизации администратора', 'error')
             return redirect(url_for('admin.documents'))
+        
         # --- Автоматическая обработка документа ---
         from document_processor import DocumentProcessor
         processor = DocumentProcessor(upload_folder=upload_folder)
