@@ -3,12 +3,40 @@
    ======================= */
 
 :root {
+    --text-wb: #0077ff;
+    --card-color: #363a5d;
+    --border-color: #dbdbdb;
     --primary-gradient: #ffffff;
     --secondary-gradient: linear-gradient(135deg, #91a6ff 0%, #5778ff 100%);
     --primary-color: #4A6CF7;
     --secondary-color: #3B5BDB;
+    --bg-light: #5a5a5a;
+    --bg-dark: #fbfbfb;
+    --card-bg: #f8f9fa;
+    --border-radius: 12px;
+    --box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    --transition: 0.2s;
+    --color-text-dark: #374151;
+    --color-text-light: #fff;
+    --color-border: #E5E7EB;
+    --color-muted: #9CA3AF;
+    --color-blue: #007bff;
+    --color-gray: #6c757d;
+    --stat-bg: rgba(255, 255, 255, 0.05);
+    --feature-bg: rgba(255, 255, 255, 0.1);
+    --blur: blur(10px);
+}
+
+body.theme-dark {
+    --text-wb: #0048ff;
+    --card-color: #1c2333;
+    --border-color: #272727;
+    --primary-gradient: #151718;
+    --secondary-gradient: linear-gradient(135deg, #41519b 0%, #0e1e5d 100%);
+    --primary-color: #2e313e;
+    --secondary-color: #3B5BDB;
     --bg-light: #fff;
-    --bg-dark: #212529;
+    --bg-dark: #232429;
     --card-bg: #f8f9fa;
     --border-radius: 12px;
     --box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
@@ -46,9 +74,9 @@
    Навигация
    ======================= */
 .nav-bar {
-    background: #ffffff;
+    background: var(--bg-dark);
     height: 60px;
-    border-bottom: 1px solid #d9d9d9;
+    border-bottom: 1px solid var(--border-color);
     position: sticky;
     top: 0;
     z-index: 100;
@@ -67,7 +95,8 @@
     color: #ffffff !important;
 }
 
-.navbar-switch {
+.navbar-switch,
+.navbar-settings {
     border: none;
     display: flex;
     align-items: center;
@@ -75,7 +104,8 @@
     background: none;
     transition: transform 0.3s ease-in-out;
 }
-.navbar-switch:hover {
+.navbar-switch:hover,
+.navbar-settings:hover {
     transform: scale(1.05) rotate(180deg);
 }
 
@@ -98,6 +128,7 @@
     display: flex;
     cursor: pointer;
     gap: 7px;
+    color: var(--bg-light);
     transition: transform 0.2s ease-in-out;
     padding: 2px 10px 2px 8px;
     border-radius: 16px;
@@ -111,7 +142,7 @@
 .bolash-menu {
     display: flex;
     align-items: center;
-    gap: 15px;
+    /* gap: 15px; */
     font-size: 16px;
     color: #353535;
     text-decoration: none;
@@ -120,7 +151,7 @@
 
 .brand-ai {
     font-size: 12px;
-    color: #353535;
+    color: var(--bg-light);
     text-decoration: none;
     font-weight: 400;
 }
@@ -130,6 +161,8 @@
     border-radius: 20px;
     padding: 2px;
     background: #ffffff;
+    gap: 5px;
+    align-items: flex-end;
 }
 
 .univercity-brand,
@@ -137,29 +170,33 @@
     display: flex;
     align-items: center;
     font-size: 16px;
-    color: #303030;
+    color: var(--bg-light);
     text-decoration: none;
     font-weight: 500;
 }
 
 .switch-decor {
-    border-right: 1px solid #b1b1b1;
+    border-right: 1px solid var(--border-color);
+}
+
+.switch-decor-mobile{
+    border-left:1px solid #b1b1b1;
 }
 
 .bolashak-text {
     font-size: 55px;
-    color: #1e1e1e;
+    color: var(--bg-light);
 }
 
 .text-bolash {
-    color: #1e1e1e;
+    color: var(--bg-light);
     font-weight: 300;
     padding: 5px 0;
     font-size: 19px;
 }
 
 .text-primary {
-    color: #1e1e1e !important;
+    color: var(--bg-light) !important;
 }
 
 /* =======================
@@ -168,7 +205,7 @@
 .hero-section {
     min-height: 100vh;
     color: var(--color-text-light);
-    background: #f9f9f9;
+    background: var(--primary-gradient);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -182,7 +219,7 @@
    ======================= */
 .feature-item {
     display: flex;
-    color: #1e1e1e;
+    color: var(--bg-light);
     align-items: center;
     gap: 0.5rem;
     background: var(--feature-bg);
@@ -215,7 +252,7 @@
 .stat-number {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #007fff;
+    color: var(--text-wb);
 }
 .stat-label {
     font-size: 0.875rem;
@@ -236,14 +273,77 @@
 @media (max-width: 992px) {
     .container-bar {
         width: 98%;
+        padding: 0 10px;
+        flex-direction: column;
+        align-items: stretch;
     }
     .hero-section .container {
         padding: 0 8px;
+        width: 100%;
     }
     .bolashak-text {
         font-size: 38px;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    .text-bolash {
+        font-size: 18px;
+        text-align: center;
+        padding: 20px 0 20px 0;
+    }
+    .d-flex {
+        gap: 8px !important;
+        padding: 11px;
+        flex-direction: column;
+    }
+    .feature-item {
+        font-size: 1rem;
+        justify-content: flex-start;
+        width: 100%;
+    }
+    .stats-grid {
+        gap: 0.5rem;
+        grid-template-columns: 1fr;
+    }
+    .card {
+        margin-bottom: 12px;
+        width: 100%;
+    }
+    .btn {
+        width: 90%;
+        font-size: 1rem;
+        padding: 10px 0px 10px 0;
+        margin: 15px 10px 15px 15px;
+    }
+    .row {
+        flex-direction: column;
+        margin: 0;
+    }
+    .col-lg-6 {
+        width: 100%;
+        max-width: 100%;
+        flex: unset;
+    }
+    .nav-bar {
+        height: auto;
+        flex-direction: column;
+        align-items: stretch;
+        display: none !important;
+    }
+    .menu-panel, .bolash-menu {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        align-items: stretch;
+    }
+    .hero-section {
+        min-height: unset;
+        padding: 24px 0;
+        flex-direction: column;
+        align-items: stretch;
     }
 }
+
 @media (max-width: 768px) {
     .container-bar {
         width: 100%;
@@ -285,9 +385,11 @@
 }
 
 @media (max-width: 480px) {
+    .container-bar, .hero-section .container {
+        padding: 0 2px;
+    }
     .container-bar {
         flex-direction: column;
-        padding: 0 2px;
     }
     .bolash-menu {
         flex-direction: column;
@@ -297,8 +399,16 @@
     .menu-panel {
         width: 100%;
     }
+    .bolashak-text {
+        padding: 30px 0 10px;
+        font-size: 24px;
+        border-bottom: 1px solid #d3d3d3;
+    }
     .hero-section {
-        padding: 12px 0;
+        padding: 8px 0;
+    }
+    .card {
+        padding: 2px;
     }
 }
 
@@ -351,11 +461,13 @@
    Карточки
    ======================= */
 .card {
-    background: #465565 !important;
+    background: var(--card-color)
+ !important;
     border-radius: 10px;
     border: none;
     box-shadow: -10px 15px 0px rgba(0, 0, 0, 0.1);
-    transition: transform var(--transition), box-shadow var(--transition);
+    transition: transform var(
+    --transition), box-shadow var(--transition);
 }
 .card:hover {
     transform: translateY(-2px);
@@ -366,325 +478,13 @@
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-8px);}
     to { opacity: 1; transform: translateY(0);}
-}/* =======================
-   Базовые переменные и стили
-   ======================= */
-
-:root {
-    --primary-gradient: #ffffff;
-    --secondary-gradient: linear-gradient(135deg, #91a6ff 0%, #5778ff 100%);
-    --primary-color: #4A6CF7;
-    --secondary-color: #3B5BDB;
-    --bg-light: #fff;
-    --bg-dark: #212529;
-    --card-bg: #f8f9fa;
-    --border-radius: 12px;
-    --box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-    --transition: 0.2s;
-    --color-text-dark: #374151;
-    --color-text-light: #fff;
-    --color-border: #E5E7EB;
-    --color-muted: #9CA3AF;
-    --color-blue: #007bff;
-    --color-gray: #6c757d;
-    --stat-bg: rgba(255, 255, 255, 0.05);
-    --feature-bg: rgba(255, 255, 255, 0.1);
-    --blur: blur(10px);
 }
 
 /* =======================
-   Утилиты для flex и позиционирования
+   Мобильная навигация и бургер
    ======================= */
-.flex-row { display: flex; flex-direction: row; }
-.flex-col { display: flex; flex-direction: column; }
-.flex-center { display: flex; align-items: center; justify-content: center; }
-.flex-between { display: flex; justify-content: space-between; align-items: center; }
-.flex-end { display: flex; align-items: flex-end; }
-.sticky { position: sticky; top: 0; z-index: 100; }
-.relative { position: relative; }
-.absolute { position: absolute; }
-.fixed { position: fixed; }
-.center-absolute { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
 
-::-webkit-scrollbar {
-    display: none;
-}
-
-/* =======================
-   Навигация
-   ======================= */
-.nav-bar {
-    background: #ffffff;
-    height: 60px;
-    border-bottom: 1px solid #d9d9d9;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-}
-.container-bar {
-    width: 68%;
-    margin: auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.text-primary-two {
-    color: #ffffff !important;
-}
-
-.navbar-switch {
-    border: none;
-    display: flex;
-    align-items: center;
-    color: #414141;
-    background: none;
-    transition: transform 0.3s ease-in-out;
-}
-.navbar-switch:hover {
-    transform: scale(1.05) rotate(180deg);
-}
-
-.bolash-decor {
-    display: flex;
-    flex-direction: column;
-    border-right: 1px solid #b1b1b1;
-    padding: 0 15px 0 5px;
-    align-items: flex-end;
-}
-
-.menu-panel {
-    display: flex;
-    flex-direction: row;
-    gap: 0;
-    padding: 8px;
-    border-radius: 6px;
-}
-.menu-item {
-    display: flex;
-    cursor: pointer;
-    gap: 7px;
-    transition: transform 0.2s ease-in-out;
-    padding: 2px 10px 2px 8px;
-    border-radius: 16px;
-    margin: 0 10px 0 0;
-    align-items: center;
-}
-.menu-item:hover {
-    transform: scale(1.1);
-}
-
-.bolash-menu {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    font-size: 16px;
-    color: #353535;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.brand-ai {
-    font-size: 12px;
-    color: #353535;
-    text-decoration: none;
-    font-weight: 400;
-}
-
-.navbar-switch-container {
-    display: flex;
-    border-radius: 20px;
-    padding: 2px;
-    background: #ffffff;
-}
-
-.univercity-brand,
-.univercity-brand-name {
-    display: flex;
-    align-items: center;
-    font-size: 16px;
-    color: #303030;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.switch-decor {
-    border-right: 1px solid #b1b1b1;
-}
-
-.bolashak-text {
-    font-size: 55px;
-    color: #1e1e1e;
-}
-
-.text-bolash {
-    color: #1e1e1e;
-    font-weight: 300;
-    padding: 5px 0;
-    font-size: 19px;
-}
-
-.text-primary {
-    color: #1e1e1e !important;
-}
-
-/* =======================
-   Hero section
-   ======================= */
-.hero-section {
-    min-height: 100vh;
-    color: var(--color-text-light);
-    background: #f9f9f9;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.hero-section .container {
-    width: 100%;
-}
-
-/* =======================
-   Фичи на главной
-   ======================= */
-.feature-item {
-    display: flex;
-    color: #1e1e1e;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--feature-bg);
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    backdrop-filter: var(--blur);
-    box-shadow: -6px 7px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out;
-}
-.feature-item:hover {
-    transform: scale(1.05);
-}
-
-/* =======================
-   Статистика университета
-   ======================= */
-.university-info .stats-grid,
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    margin-top: 1rem;
-    /* justify-items: start; */
-}
-.stat-item {
-    text-align: center;
-    padding: 1rem;
-    background: var(--stat-bg);
-    border-radius: 0.5rem;
-}
-.stat-number {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #007fff;
-}
-.stat-label {
-    font-size: 0.875rem;
-    color: #ffffff;
-}
-
-/* Адаптивная сетка и отступы */
-@media (max-width: 992px) {
-    .container-bar {
-        width: 100%;
-        padding: 0 10px;
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .nav-bar {
-        height: auto;
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .menu-panel, .bolash-menu {
-        flex-direction: column;
-        gap: 8px;
-        width: 100%;
-        align-items: stretch;
-    }
-    .hero-section {
-        min-height: unset;
-        padding: 24px 0;
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .hero-section .container {
-        padding: 0;
-        width: 100%;
-    }
-    .bolashak-text {
-        font-size: 24px;
-        text-align: center;
-        margin-bottom: 10px;
-    }
-    .text-bolash {
-        font-size: 18px;
-        text-align: center;
-        padding: 20px 0 20px 0;
-    }
-    .d-flex {
-        gap: 8px !important;
-        padding: 11px;
-        flex-direction: column;
-    }
-    .feature-item {
-        font-size: 1rem;
-        justify-content: flex-start;
-        width: 100%;
-    }
-    .stats-grid {
-        gap: 0.5rem;
-    }
-    .card {
-        margin-bottom: 12px;
-        width: 100%;
-    }
-    .btn {
-        width: 90%;
-        font-size: 1rem;
-        padding: 10px 0px 10px 0;
-        margin: 15px 10px 15px 15px;
-    }
-    .row {
-        flex-direction: column;
-        margin: 0;
-    }
-    .col-lg-6 {
-        width: 100%;
-        max-width: 100%;
-        flex: unset;
-        /* display: contents; */
-    }
-}
-
-/* Для совсем маленьких */
-@media (max-width: 480px) {
-    .container-bar, .hero-section .container {
-        padding: 0 2px;
-    }
-    .bolashak-text {
-        padding: 30px 0 10px;
-        font-size: 24px;
-        border-bottom: 1px solid #d3d3d3;
-    }
-    .hero-section {
-        padding: 8px 0;
-    }
-    .card {
-        padding: 2px;
-    }
-}
-/* ...ваши остальные стили... */
-
-/* Бургер скрыт на десктопе */
+/* По умолчанию бургер скрыт на десктопе */
 .mobile-burger {
     display: none;
     position: fixed;
@@ -725,13 +525,22 @@
     align-items: flex-start;
 }
 .mobile-nav a {
-    /* font-size: 1.2rem; */
     color: #2f2f2f;
     text-decoration: none;
     padding: 4px 12px;
     display: flex;
     align-items: center;
     gap: 8px;
+}
+.mobile-nav-decor{
+    padding: 6px;
+}
+.mobile-ul-container{
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 20px 0 0px;
+    flex-direction: row;
+    align-items: baseline;
 }
 
 /* Адаптив: показать бургер и скрыть nav-bar на мобиле */
@@ -753,112 +562,6 @@
     }
 }
 
-
-
-/* По умолчанию бургер скрыт на десктопе */
-.mobile-burger {
-    display: none;
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    z-index: 999;
-    background: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 2rem;
-}
-/* =======================
-   Админ панель
-   ======================= */
-.admin-sidebar {
-    background: #343a40;
-    min-height: 100vh;
-    position: sticky;
-    top: 0;
-    left: 0;
-}
-.admin-content {
-    background: var(--card-bg);
-    min-height: 100vh;
-}
-
-/* =======================
-   Улучшения форм и кнопок
-   ======================= */
-.form-control:focus {
-    box-shadow: none !important;
-    background: white !important;
-    color: black !important;
-}
-.btn-primary {
-    background: #007fff;
-    border: none;
-    box-shadow: 0 -200px 100px -120px #c94df1 inset;
-    animation: backgr 3s infinite alternate;
-    transition: background 0.2s, transform 0.2s;
-}
-@keyframes backgr {
-    50% {
-        background: skyblue;
-        box-shadow: 0 -200px 100px -100px #3253cd inset;
-        transform: translateY(-6px);
-    }
-    100% {
-        transform: scale(1.05);
-    }
-}
-.btn-primary:hover {
-    background: linear-gradient(135deg, #7391d9 0%, #364cb0 100%);
-    transform: translateY(-1px);
-}
-
-.mobile-nav-decor{
-    padding: 6px;
-}
-
-.mobile-ul-container{
-    display: flex;
-    justify-content: space-between;
-    padding: 0px 20px 0 0px;
-    flex-direction: row;
-    align-items: baseline;
-}
-
-.navbar-switch-container{
-    display: flex;
-    gap: 5px;
-    align-items: flex-end;
-}
-
-.switch-decor-mobile{
-    border-left:1px solid #b1b1b1;
-}
-
-/* =======================
-   Карточки
-   ======================= */
-.card {
-    background: #465565 !important;
-    border-radius: 10px;
-    border: none;
-    box-shadow: -10px 15px 0px rgba(0, 0, 0, 0.1);
-    transition: transform var(--transition), box-shadow var(--transition);
-}
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-/* Анимация появления */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-8px);}
-    to { opacity: 1; transform: translateY(0);}
-}
 #mobileNav {
     display: none;
     flex-direction: column;
