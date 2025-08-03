@@ -135,3 +135,133 @@ def get_agents():
     except Exception as e:
         logger.error(f"Error getting agents info: {str(e)}")
         return jsonify({'error': 'Failed to get agents information'}), 500
+
+
+@main_bp.route('/api/deployment-readiness')
+def deployment_readiness():
+    """
+    Comprehensive deployment readiness check
+    Комплексная проверка готовности к деплою
+    """
+    try:
+        from app import db
+        from flask import current_app
+        import os
+        import sys
+        
+        # Инициализация результата проверки
+        checks = {
+            'database': {'status': 'unknown', 'message': ''},
+            'agents': {'status': 'unknown', 'message': ''},
+            'environment': {'status': 'unknown', 'message': ''},
+            'dependencies': {'status': 'unknown', 'message': ''},
+            'configuration': {'status': 'unknown', 'message': ''}
+        }
+        
+        overall_status = 'healthy'
+        
+        # 1. Проверка базы данных
+        try:
+            # Проверяем соединение с базой данных
+            from sqlalchemy import text
+            # Простая проверка - создание таблиц
+            db.create_all()
+            checks['database']['status'] = 'healthy'
+            checks['database']['message'] = 'База данных доступна и отвечает'
+        except Exception as e:
+            checks['database']['status'] = 'error'
+            checks['database']['message'] = f'Ошибка подключения к БД: {str(e)}'
+            overall_status = 'error'
+        
+        # 2. Проверка агентов
+        try:
+            router = initialize_agent_router()
+            agents = router.get_available_agents()
+            if len(agents) > 0:
+                checks['agents']['status'] = 'healthy'
+                checks['agents']['message'] = f'Доступно агентов: {len(agents)}'
+            else:
+                checks['agents']['status'] = 'warning'
+                checks['agents']['message'] = 'Агенты не настроены'
+                if overall_status != 'error':
+                    overall_status = 'warning'
+        except Exception as e:
+            checks['agents']['status'] = 'error'
+            checks['agents']['message'] = f'Ошибка инициализации агентов: {str(e)}'
+            overall_status = 'error'
+        
+        # 3. Проверка переменных окружения
+        required_env = ['DATABASE_URL', 'SESSION_SECRET']
+        env_issues = []
+        for env_var in required_env:
+            if not os.environ.get(env_var):
+                env_issues.append(env_var)
+        
+        if env_issues:
+            checks['environment']['status'] = 'warning'
+            checks['environment']['message'] = f'Отсутствуют переменные: {", ".join(env_issues)}'
+            if overall_status == 'healthy':
+                overall_status = 'warning'
+        else:
+            checks['environment']['status'] = 'healthy'
+            checks['environment']['message'] = 'Все необходимые переменные окружения настроены'
+        
+        # 4. Проверка зависимостей
+        try:
+            import flask, sqlalchemy, gunicorn, requests
+            checks['dependencies']['status'] = 'healthy'
+            checks['dependencies']['message'] = f'Python {sys.version.split()[0]}, Flask {flask.__version__}'
+        except ImportError as e:
+            checks['dependencies']['status'] = 'error'
+            checks['dependencies']['message'] = f'Отсутствуют зависимости: {str(e)}'
+            overall_status = 'error'
+        
+        # 5. Проверка конфигурации
+        config_issues = []
+        
+        # Проверяем настройки безопасности для продакшена
+        if current_app.debug and os.environ.get('FLASK_ENV') == 'production':
+            config_issues.append('Debug режим включен в продакшене')
+        
+        # Проверяем секретный ключ
+        if current_app.secret_key == 'dev-secret-key-change-in-production':
+            config_issues.append('Используется тестовый секретный ключ')
+        
+        if config_issues:
+            checks['configuration']['status'] = 'warning'
+            checks['configuration']['message'] = '; '.join(config_issues)
+            if overall_status == 'healthy':
+                overall_status = 'warning'
+        else:
+            checks['configuration']['status'] = 'healthy'
+            checks['configuration']['message'] = 'Конфигурация корректна'
+        
+        # Формирование итогового ответа
+        result = {
+            'overall_status': overall_status,
+            'timestamp': time.time(),
+            'checks': checks,
+            'deployment_ready': overall_status != 'error',
+            'recommendations': []
+        }
+        
+        # Добавляем рекомендации
+        if overall_status == 'error':
+            result['recommendations'].append('Исправьте критические ошибки перед деплоем')
+        elif overall_status == 'warning':
+            result['recommendations'].append('Рекомендуется исправить предупреждения')
+            result['recommendations'].append('Настройте переменные окружения для продакшена')
+        else:
+            result['recommendations'].append('Проект готов к деплою')
+            result['recommendations'].append('Используйте Gunicorn для продакшена')
+            result['recommendations'].append('Настройте PostgreSQL для продакшена')
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"Error in deployment readiness check: {str(e)}")
+        return jsonify({
+            'overall_status': 'error',
+            'error': f'Ошибка проверки готовности: {str(e)}',
+            'deployment_ready': False
+        }), 500
