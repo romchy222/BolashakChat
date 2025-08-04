@@ -528,7 +528,7 @@ body.theme-dark .main-content {
   height: 36px;
   color: #4b89ff;
   cursor: pointer;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);

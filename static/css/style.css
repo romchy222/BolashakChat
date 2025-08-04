@@ -162,7 +162,7 @@ body.theme-dark {
 
 .navbar-switch-container {
     display: flex;
-    border-radius: 20px;
+    border-radius: 16%;
     padding: 2px;
     background: #ffffff;
     gap: 5px;
@@ -180,7 +180,7 @@ body.theme-dark {
 }
 
 .switch-decor {
-    border-right: 1px solid var(--border-color);
+    /* border-right: 1px solid var(--border-color); */
 }
 
 .switch-decor-mobile{
@@ -188,7 +188,7 @@ body.theme-dark {
 }
 
 .bolashak-text {
-    font-size: 55px;
+    font-size: 36px;
     color: var(--bg-light);
 }
 
@@ -226,18 +226,19 @@ body.theme-dark {
 }
 
 .cb-list{
+    display: flex;
     list-style-type: none !important;
     width: 100%;
     border-radius: 10px;
     background: var(--bg-dark);
     width: 50%;
-    padding: 10px 0px 10px 20px;
+    gap: 30px;
+    flex-direction: column;
 }
 
 .cb-list-item{
     color: var(--bg-light);
     font-size: 14px;
-    margin: 10px 20px 20px 0;
     background: var(--bg-dark);
     border: 1px solid var(--cb-border-color);
     border-radius: 9px;
@@ -256,14 +257,30 @@ body.theme-dark {
 }
 
 .decor-2{
+  margin: 10px 20px 20px 0;
+  width: 100%;
   display:flex;
-
 }
 
 .cb-photo{
-    
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    height: 100%;
+    }
+
+.cb-img{
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    border-radius: 10px;
+    height: auto;
+    width: auto;
+    object-fit: contain;
 }
 
+ol, ul{
+    padding-left:none !important;
+}
 
 
 /* =======================
@@ -281,11 +298,16 @@ body.theme-dark {
     width: 100%;
 }
 
+.col-lg-6{
+    width:100% !important;
+}
+
 .min-vh-100{
-    min-height: 60vh!important;
+    min-height:85vh !important;
 }
 .align-items-center{
-    align-items: center !important;
+    margin: 50px 0px 80px 0 !important;
+    align-items: flex-end !important;
 }
 
 /* =======================
@@ -555,6 +577,36 @@ body.theme-dark {
     to { opacity: 1; transform: translateY(0);}
 }
 
+
+.footer{
+    background: var(--bg-dark);
+    border-top: 1px solid var(--border-color);
+    padding: 10px 0;
+    color: var(--bg-dark) !important;
+    text-align: center;
+    font-size: 14px;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    z-index: 100
+}
+
+.footer-text{
+    display: flex;
+    color: var(--bg-light);
+    text-align:end;
+    margin:0;
+    gap: 10px;
+    align-items: center;
+}
+
+.fot-text-container{
+    margin: 10px;
+    display:flex;
+    justify-content: space-between;
+    flex-direction: row-reverse;
+}
+
 /* =======================
    Мобильная навигация и бургер
    ======================= */
@@ -626,6 +678,17 @@ body.theme-dark {
     .cb{
         margin:16px;
     }
+    .cb-list{
+        width: 100%;   
+        display:flex;
+        flex-direction: column;
+        padding:0;
+    }
+
+    .decor-2{
+        display:flex;
+        flex-direction: column;
+    }
     .mobile-burger {
         display: flex !important;
     }
@@ -649,3 +712,4 @@ body.theme-dark {
 #mobileNav.open {
     display: flex;
 }
+
