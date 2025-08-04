@@ -17,7 +17,7 @@
       <span id="sidebar-toggle" class="material-symbols-outlined menu-icon" title="Открыть меню">menu</span>
       <div class="model-panel">
         <div class="model-panel-title" id="providerSelector" tabindex="0">
-          BolashAI <span class="model-panel-arrow">&#9662;</span>
+          BolashakAI <span class="model-panel-arrow">&#9662;</span>
         </div>
         <div class="model-panel-dropdown" id="modelDropdown" style="display:none;">
           <input
@@ -119,7 +119,7 @@
             <span class="material-symbols-outlined">
             graphic_eq</span>
           </button>
-          <button type="button" id="add-btn" class="add-btn" title="Вложения"><span class="material-symbols-outlined">add_2</span>
+          <button type="button" id="add-btn" class="add-btn" title="Голосовой чат"><span class="material-symbols-outlined">voice_chat</span>
           </button>
           <input type="text" id="chat-input" data-i18n-placeholder="placeholder" placeholder="Введите сообщение..." autocomplete="off" />
           <button type="submit" class="send-btn" aria-label="Отправить">
@@ -130,11 +130,18 @@
         </form>
       </div>
     </div>
+    <div id="voice-chat-overlay" class="voice-chat-overlay hidden">
+      <div class="voice-circle"></div>
+      <button class="voice-exit-btn" title="Закрыть голосовой режим">✖</button>
+    </div>
+
   </main>
+  <script type="module" src="{{ url_for('static', filename='js/voice.js') }}"></script>
   <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
   <script type="module" src="{{ url_for('static', filename='js/i18n.js') }}"></script>
   <script type="module" src="{{ url_for('static', filename='js/localization.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked@16.1.1/lib/marked.umd.min.js"></script>
+  
   <script>
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebar = document.getElementById('sidebar');

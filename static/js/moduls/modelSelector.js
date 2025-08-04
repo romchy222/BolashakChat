@@ -10,7 +10,7 @@ export function setupModelSelector({
 }) {
   // 1. Заголовок - всегда BolashAI
   modelSelectorCurrent.innerHTML = `
-    BolashAI <span class="model-panel-arrow">&#9662;</span>
+    BolashakAI <span class="model-panel-arrow">&#9662;</span>
   `;
   console.log('[ModelSelector] Заголовок установлен: BolashAI');
 
