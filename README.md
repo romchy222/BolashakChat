@@ -1,113 +1,171 @@
-# BolashakBot - University Chatbot System
+## Русский
 
-## Overview
+# BolashakBot — Университетский чат-бот
 
-BolashakBot is a bilingual (Russian/Kazakh) chatbot system designed for Kyzylorda "Bolashak" University to help prospective students get information about admissions, programs, and requirements. The system uses Flask as the web framework and integrates with Mistral AI for intelligent responses based on an FAQ database.
+### Обзор
 
-## User Preferences
+BolashakBot — это двухъязычная (русский/казахский) система чат-бота, созданная для университета «Болашак» (Кызылорда), чтобы помогать абитуриентам получать информацию о поступлении, программах и требованиях.
 
-Preferred communication style: Simple, everyday language.
-Widget design requirements: Minimal, clean layout matching university website style (white background, gray/black text, no bright accent colors).
+### Предпочтения пользователей
 
-## System Architecture
+- Предпочтительный стиль коммуникации: простой, повседневный язык.
+- Дизайн виджета: минимализм, чистый стиль, соответствующий сайту университета (белый фон, серый/чёрный текст, без ярких акцентов).
 
-The application follows a traditional web application architecture with the following key components:
+### Архитектура системы
 
-### Frontend
-- **Technology**: HTML5, Bootstrap 5, vanilla JavaScript
-- **Interface**: Single-page application with an embedded chat widget
-- **Styling**: Custom CSS with Bootstrap framework and Font Awesome icons
-- **Responsive Design**: Mobile-friendly interface with collapsible navigation
+**Frontend**
+- Технологии: HTML5, Bootstrap 5, чистый JavaScript
+- Интерфейс: одностраничное приложение с встроенным чатом
+- Оформление: собственный CSS с использованием Bootstrap и иконок Font Awesome
+- Адаптивность: мобильная версия, collapsible-меню
 
-### Backend
-- **Framework**: Flask (Python web framework)
-- **Architecture Pattern**: Blueprint-based modular structure
-- **Database ORM**: SQLAlchemy with Flask-SQLAlchemy extension
-- **Session Management**: Flask sessions for admin authentication
-- **API Design**: RESTful endpoints for chat functionality
+**Backend**
+- Фреймворк: Flask (Python)
+- Архитектурный паттерн: модульная структура на Blueprints
+- ORM: SQLAlchemy через Flask-SQLAlchemy
+- Сессии: Flask-сессии для админов
+- API: RESTful endpoints для чата
 
-### Database Design
-- **Default Database**: SQLite (configured for development)
-- **Production Ready**: Configurable for PostgreSQL via DATABASE_URL environment variable
-- **Schema**: Relational database with proper foreign key relationships
-- **Migration Support**: SQLAlchemy-based table creation and management
+**База данных**
+- По умолчанию: SQLite (для разработки)
+- Продакшн: поддержка PostgreSQL (через DATABASE_URL)
+- Схема: реляционная база с внешними ключами
+- Миграции: SQLAlchemy-скрипты
 
-## Key Components
+### Ключевые компоненты
 
-### Models (`models.py`)
-- **Category**: Bilingual categories for organizing FAQs
-- **FAQ**: Bilingual question-answer pairs with category relationships
-- **UserQuery**: Conversation logs with analytics data
-- **AdminUser**: Authentication system for administrative access
+- Модели: Category, FAQ, UserQuery, AdminUser
+- Blueprints: основной (chat API), admin (панель управления), auth (авторизация)
+- Интеграция AI: Mistral AI API (mistral_client.py), поиск по FAQ (utils.py), поддержка двух языков
+- Админ-функции: дашборд, управление FAQ и категориями, аналитика запросов
 
-### Blueprints
-- **Main Blueprint** (`views.py`): Public chat interface and API endpoints
-- **Admin Blueprint** (`admin.py`): Administrative dashboard and management
-- **Auth Blueprint** (`auth.py`): Authentication and session management
+### Логика работы
 
-### AI Integration
-- **Mistral AI Client** (`mistral_client.py`): External API integration for natural language processing
-- **Context Retrieval** (`utils.py`): FAQ database search and context preparation
-- **Bilingual Support**: Language-specific system prompts and responses
+1. Пользователь отправляет сообщение
+2. Система ищет релевантные данные в FAQ
+3. Mistral AI формирует ответ
+4. Ответ возвращается пользователю
+5. Данные сохраняются для аналитики
 
-### Administrative Features
-- **Dashboard**: Analytics and statistics overview
-- **FAQ Management**: CRUD operations for questions and answers
-- **Category Management**: Organization system for content
-- **Query Analytics**: User interaction tracking and performance metrics
+### API
 
-## Data Flow
+- POST /api/chat — чат с пользователем
+- GET /auth/verify-session — проверка сессии админа
+- /admin/* — административные функции
 
-1. **User Interaction**: User sends message through chat widget
-2. **Context Retrieval**: System searches FAQ database for relevant content
-3. **AI Processing**: Mistral AI generates response using retrieved context
-4. **Response Delivery**: Formatted response sent back to user
-5. **Analytics Logging**: Interaction data stored for admin analysis
+### Зависимости
 
-### API Endpoints
-- `POST /api/chat`: Main chat endpoint for user messages
-- `GET /auth/verify-session`: Admin session verification
-- Admin routes under `/admin/` prefix for management functions
+- Внешние сервисы: Mistral AI, Bootstrap CDN, Font Awesome CDN
+- Python-пакеты: Flask, SQLAlchemy, Werkzeug, Requests
+- Переменные окружения: DATABASE_URL, MISTRAL_API_KEY, SESSION_SECRET
 
-## External Dependencies
+### Развёртывание
 
-### Third-Party Services
-- **Mistral AI API**: Primary AI service for generating responses
-- **Bootstrap CDN**: Frontend styling framework
-- **Font Awesome CDN**: Icon library
+**Для разработки**
+- Точка входа: main.py (debug)
+- Локальная БД: SQLite
+- Hot Reload
 
-### Python Packages
-- **Flask**: Web framework and routing
-- **SQLAlchemy**: Database ORM and management
-- **Werkzeug**: Security utilities (password hashing, proxy handling)
-- **Requests**: HTTP client for external API calls
+**Для продакшн**
+- БД: PostgreSQL
+- Безопасность: секреты через переменные
+- ProxyFix для обратного прокси
+- Защищённые сессии
 
-### Environment Variables
-- `DATABASE_URL`: Database connection string
-- `MISTRAL_API_KEY`: API key for Mistral AI service
-- `SESSION_SECRET`: Secret key for session management
+**Инициализация БД**
+- setup_db.py — скрипт для заполнения БД
+- database.py — управление таблицами
+- Примерные категории и FAQ по умолчанию
 
-## Deployment Strategy
+**Производительность**
+- Пул соединений SQLAlchemy
+- Аналитика по времени отклика
+- Готовность к кешированию
 
-### Development Setup
-- **Entry Point**: `main.py` with debug mode enabled
-- **Local Database**: SQLite with automatic table creation
-- **Hot Reload**: Flask development server with debug=True
+---
 
-### Production Considerations
-- **Database**: Configurable via DATABASE_URL for PostgreSQL
-- **Security**: Environment-based configuration for secrets
-- **Proxy Support**: ProxyFix middleware for reverse proxy deployment
-- **Session Management**: Secure session handling with configurable secrets
+## Қазақша
 
-### Database Initialization
-- **Setup Script**: `setup_db.py` for default data initialization
-- **Database Utils**: `database.py` for table management and reset functionality
-- **Default Content**: Pre-configured categories and sample FAQ entries
+# BolashakBot — Университеттік чат-бот жүйесі
 
-### Performance Features
-- **Connection Pooling**: SQLAlchemy engine options for connection management
-- **Response Time Tracking**: Performance analytics for optimization
-- **Caching Ready**: Structure supports future caching implementation
+### Жалпы шолу
 
-The system is designed to be easily deployable on various platforms with minimal configuration changes, while maintaining separation of concerns and modularity for future enhancements.
+BolashakBot — екі тілде (орысша/қазақша) жұмыс істейтін чат-бот жүйесі, Кызылордадағы «Болашақ» университеті үшін жасалған. Мақсаты — талапкерлерге қабылдау, бағдарламалар және талаптар туралы ақпарат беру.
+
+### Пайдаланушының қалауы
+
+- Қарым-қатынас тілі: қарапайым, күнделікті тіл.
+- Виджет дизайны: минималистік, таза стиль, университет сайтына сәйкес (ақ фон, сұр/қара мәтін, ашық түстерсіз).
+
+### Жүйе архитектурасы
+
+**Frontend**
+- Технология: HTML5, Bootstrap 5, таза JavaScript
+- Интерфейс: бір беттен тұратын қосымша, ендірілген чат-виджетпен
+- Стильдеу: жеке CSS, Bootstrap және Font Awesome иконкаларымен
+- Адаптивтілік: мобильді құрылғыларға бейімделген интерфейс, жиналмалы меню
+
+**Backend**
+- Фреймворк: Flask (Python)
+- Архитектура: Blueprint-ке негізделген модульдік құрылым
+- ORM: SQLAlchemy (Flask-SQLAlchemy арқылы)
+- Сессиялар: Әкімшіге арналған Flask-сессиялар
+- API: Чат үшін RESTful endpoint-тар
+
+**Мәліметтер базасы**
+- Әдепкі: SQLite (әзірлеу үшін)
+- Өндірістік режим: PostgreSQL қолдауы (DATABASE_URL арқылы)
+- Схема: байланысқан кестелер (foreign key)
+- Миграция: SQLAlchemy негізінде
+
+### Негізгі компоненттер
+
+- Модельдер: Category, FAQ, UserQuery, AdminUser
+- Blueprints: негізгі (чат API), admin (басқару панелі), auth (аутентификация)
+- AI интеграциясы: Mistral AI API (mistral_client.py), FAQ іздеу (utils.py), екітілді қолдау
+- Әкімшілік функциялар: дашборд, FAQ және категориялармен жұмыс, сұраныстар аналитикасы
+
+### Жұмыс барысы
+
+1. Пайдаланушы хабарлама жібереді
+2. Жүйе FAQ базасынан сәйкес ақпаратты іздейді
+3. Mistral AI жауап дайындайды
+4. Жауап пайдаланушыға қайтарылады
+5. Жазбалар аналитика үшін сақталады
+
+### API
+
+- POST /api/chat — чат үшін
+- GET /auth/verify-session — әкімші сессиясын тексеру
+- /admin/* — әкімшілік функциялар
+
+### Тәуелділіктер
+
+- Сыртқы сервистер: Mistral AI, Bootstrap CDN, Font Awesome CDN
+- Python пакеттері: Flask, SQLAlchemy, Werkzeug, Requests
+- Ортаның айнымалылары: DATABASE_URL, MISTRAL_API_KEY, SESSION_SECRET
+
+### Жүйені орналастыру
+
+**Даму үшін**
+- Кіру нүктесі: main.py (debug)
+- Локалдық база: SQLite
+- Hot Reload
+
+**Өндірістік режим**
+- БД: PostgreSQL
+- Қауіпсіздік: құпиясөздер орта айнымалыларында
+- ProxyFix — реверс-прокси үшін
+- Қорғалған сессиялар
+
+**Базаны бастау**
+- setup_db.py — бастапқы деректерді енгізу
+- database.py — кестелерді басқару
+- Әдепкі FAQ пен категориялар
+
+**Өнімділік**
+- SQLAlchemy қосылым пулын қолдау
+- Жауап беру уақыты бойынша аналитика
+- Кэштеуге дайын құрылым
+
+---
