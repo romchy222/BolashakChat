@@ -1,0 +1,278 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Управление базами знаний агентов{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Управление базами знаний агентов</h2>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addKnowledgeModal">
+                    <i class="fas fa-plus"></i> Добавить знание
+                </button>
+            </div>
+
+            <!-- Agent filter -->
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <select class="form-select" id="agentFilter" onchange="filterByAgent()">
+                        <option value="">Все агенты</option>
+                        {% for agent_type, agent_name in agent_types.items() %}
+                            <option value="{{ agent_type }}" {% if agent_type == selected_agent %}selected{% endif %}>
+                                {{ agent_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Knowledge entries table -->
+            {% if knowledge_entries and knowledge_entries.items %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Агент</th>
+                            <th>Заголовок</th>
+                            <th>Ключевые слова</th>
+                            <th>Приоритет</th>
+                            <th>Статус</th>
+                            <th>Создано</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in knowledge_entries.items %}
+                        <tr>
+                            <td>
+                                <span class="badge bg-primary">{{ agent_types.get(entry.agent_type, entry.agent_type) }}</span>
+                            </td>
+                            <td>{{ entry.title }}</td>
+                            <td>{{ entry.keywords or '-' }}</td>
+                            <td>
+                                <span class="badge {% if entry.priority == 1 %}bg-success{% elif entry.priority <= 3 %}bg-warning{% else %}bg-secondary{% endif %}">
+                                    {{ entry.priority }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if entry.is_active %}
+                                    <span class="badge bg-success">Активно</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Неактивно</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ entry.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-outline-primary" 
+                                        onclick="editKnowledge({{ entry.id }}, '{{ entry.title }}', '{{ entry.content_ru }}', '{{ entry.content_kz }}', '{{ entry.keywords }}', {{ entry.priority }}, {{ entry.is_active|lower }})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <form method="POST" action="{{ url_for('admin.delete_agent_knowledge', knowledge_id=entry.id) }}" 
+                                      style="display:inline;" onsubmit="return confirm('Деактивировать это знание?')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if knowledge_entries.pages > 1 %}
+            <nav aria-label="Pagination">
+                <ul class="pagination justify-content-center">
+                    {% if knowledge_entries.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('admin.agent_knowledge', page=knowledge_entries.prev_num, agent_type=selected_agent) }}">Назад</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for page_num in knowledge_entries.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num != knowledge_entries.page %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin.agent_knowledge', page=page_num, agent_type=selected_agent) }}">{{ page_num }}</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ page_num }}</span>
+                                </li>
+                            {% endif %}
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if knowledge_entries.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('admin.agent_knowledge', page=knowledge_entries.next_num, agent_type=selected_agent) }}">Вперед</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Записи не найдены. Добавьте первое знание для агентов.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Add Knowledge Modal -->
+<div class="modal fade" id="addKnowledgeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('admin.add_agent_knowledge') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавить знание агента</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="agent_type" class="form-label">Тип агента</label>
+                                <select class="form-select" name="agent_type" required>
+                                    <option value="">Выберите агента</option>
+                                    {% for agent_type, agent_name in agent_types.items() %}
+                                        <option value="{{ agent_type }}">{{ agent_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="priority" class="form-label">Приоритет</label>
+                                <input type="number" class="form-control" name="priority" value="1" min="1" max="10">
+                                <div class="form-text">1 = высший приоритет</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Заголовок</label>
+                        <input type="text" class="form-control" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="keywords" class="form-label">Ключевые слова</label>
+                        <input type="text" class="form-control" name="keywords" placeholder="Через запятую">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="content_ru" class="form-label">Содержимое (Русский)</label>
+                                <textarea class="form-control" name="content_ru" rows="6" required></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="content_kz" class="form-label">Содержимое (Қазақша)</label>
+                                <textarea class="form-control" name="content_kz" rows="6" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Добавить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Knowledge Modal -->
+<div class="modal fade" id="editKnowledgeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" id="editKnowledgeForm">
+                <div class="modal-header">
+                    <h5 class="modal-title">Редактировать знание</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="edit_title" class="form-label">Заголовок</label>
+                                <input type="text" class="form-control" name="title" id="edit_title" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="edit_priority" class="form-label">Приоритет</label>
+                                <input type="number" class="form-control" name="priority" id="edit_priority" min="1" max="10">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_keywords" class="form-label">Ключевые слова</label>
+                        <input type="text" class="form-control" name="keywords" id="edit_keywords">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_content_ru" class="form-label">Содержимое (Русский)</label>
+                                <textarea class="form-control" name="content_ru" id="edit_content_ru" rows="6" required></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_content_kz" class="form-label">Содержимое (Қазақша)</label>
+                                <textarea class="form-control" name="content_kz" id="edit_content_kz" rows="6" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="is_active" id="edit_is_active">
+                            <label class="form-check-label" for="edit_is_active">
+                                Активно
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterByAgent() {
+    const select = document.getElementById('agentFilter');
+    const selectedAgent = select.value;
+    const url = new URL(window.location);
+    
+    if (selectedAgent) {
+        url.searchParams.set('agent_type', selectedAgent);
+    } else {
+        url.searchParams.delete('agent_type');
+    }
+    
+    window.location.href = url.toString();
+}
+
+function editKnowledge(id, title, contentRu, contentKz, keywords, priority, isActive) {
+    document.getElementById('editKnowledgeForm').action = `/admin/agent-knowledge/edit/${id}`;
+    document.getElementById('edit_title').value = title;
+    document.getElementById('edit_content_ru').value = contentRu;
+    document.getElementById('edit_content_kz').value = contentKz;
+    document.getElementById('edit_keywords').value = keywords || '';
+    document.getElementById('edit_priority').value = priority;
+    document.getElementById('edit_is_active').checked = isActive;
+    
+    new bootstrap.Modal(document.getElementById('editKnowledgeModal')).show();
+}
+</script>
+{% endblock %}

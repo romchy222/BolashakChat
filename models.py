@@ -69,6 +69,10 @@ class UserQuery(db.Model):
     agent_confidence = db.Column(db.Float)  # Confidence score of the selected agent
     context_used = db.Column(db.Boolean, default=False)  # Whether FAQ context was used
     
+    # Rating system fields
+    user_rating = db.Column(db.String(10))  # 'like', 'dislike', or null
+    rating_timestamp = db.Column(db.DateTime)  # When rating was given
+    
     session_id = db.Column(db.String(100))
     ip_address = db.Column(db.String(45))
     user_agent = db.Column(db.String(500))
@@ -128,6 +132,25 @@ class KnowledgeBase(db.Model):
     def __repr__(self):
         return f'<KnowledgeBase {self.source_type}:{self.source_id}>'
 
+class AgentKnowledgeBase(db.Model):
+    """Agent-specific knowledge base entries"""
+    __tablename__ = 'agent_knowledge_base'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    agent_type = db.Column(db.String(50), nullable=False)  # Type of agent this knowledge belongs to
+    title = db.Column(db.String(200), nullable=False)
+    content_ru = db.Column(db.Text, nullable=False)  # Content in Russian
+    content_kz = db.Column(db.Text, nullable=False)  # Content in Kazakh
+    keywords = db.Column(db.String(500))  # Search keywords
+    priority = db.Column(db.Integer, default=1)  # Priority for ordering (1=highest)
+    is_active = db.Column(db.Boolean, default=True)
+    created_by = db.Column(db.Integer, db.ForeignKey('admin_users.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<AgentKnowledgeBase {self.agent_type}:{self.title}>'
+
 class AdminUser(db.Model):
     __tablename__ = 'admin_users'
     
@@ -142,6 +165,7 @@ class AdminUser(db.Model):
     # Relationships
     documents = db.relationship('Document', backref='uploader', lazy=True)
     web_sources = db.relationship('WebSource', backref='creator', lazy=True)
+    agent_knowledge = db.relationship('AgentKnowledgeBase', backref='creator', lazy=True)
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
