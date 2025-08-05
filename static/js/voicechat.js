@@ -15,6 +15,9 @@ const pitchInput = document.getElementById('pitch-input');
 const rateLabel = document.getElementById('rate-label');
 const pitchLabel = document.getElementById('pitch-label');
 
+// Агент селектор для голосового чата
+const agentSelect = document.getElementById('agent-select');
+
 const SILERO_SPEAKERS = [
   {id: 'baya', label: 'Бая (женский)'},
   {id: 'kseniya', label: 'Ксения (женский)'},
@@ -32,6 +35,7 @@ let selectedVoice = 'baya';
 let selectedRate = 1;
 let selectedPitch = 1; // Silero не поддерживает pitch, только speed!
 let selectedEmotion = 'neutral';
+let selectedAgent = 'ai_assistant';
 
 let waveFrame = 0, waveActive = false, talking = false;
 function drawCloudWave() {
@@ -159,7 +163,32 @@ function populateSileroVoiceList() {
 }
 populateSileroVoiceList();
 
-// Эмоции — можно сделать отдельный select (здесь просто переменная)
+// ====== UI для агентов ======
+const AGENT_OPTIONS = [
+  {id: 'ai_assistant', label: 'AI-Ассистент'},
+  {id: 'ai_navigator', label: 'AI-Навигатор'},
+  {id: 'student_navigator', label: 'Студенческий навигатор'},
+  {id: 'green_navigator', label: 'GreenNavigator'},
+  {id: 'communication', label: 'Коммуникации'}
+];
+
+function populateAgentSelect() {
+  if (agentSelect) {
+    agentSelect.innerHTML = '';
+    AGENT_OPTIONS.forEach(agent => {
+      const option = document.createElement('option');
+      option.value = agent.id;
+      option.textContent = agent.label;
+      agentSelect.appendChild(option);
+    });
+    agentSelect.value = selectedAgent;
+    agentSelect.addEventListener('change', () => {
+      selectedAgent = agentSelect.value;
+      console.log('selectedAgent:', selectedAgent);
+    });
+  }
+}
+populateAgentSelect();
 const emotionSelect = document.getElementById('emotion-select');
 if (emotionSelect) {
   SILERO_EMOTIONS.forEach(em => {
@@ -242,13 +271,16 @@ if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
     const transcript = event.results[0][0].transcript;
     console.log('transcript:', transcript);
     setUI("wait");
-    // ОЗВУЧКА PLACEHOLDER
-    playSileroTTS("Секунду, думаю...", () => {});
-    // параллельно запрашиваем ответ ИИ
+    
+    // Оптимизированный запрос к ИИ с выбранным агентом
     fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: transcript })
+      body: JSON.stringify({ 
+        message: transcript,
+        agent_type: selectedAgent,
+        language: 'ru'
+      })
     })
     .then(res => {
       console.log('/api/chat response:', res);
@@ -258,7 +290,6 @@ if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
       console.log('/api/chat data:', data);
       const botReply = data.response || 'Извините, не удалось получить ответ.';
       setUI("speak");
-      stopSileroPlayback();
       speaking = true;
       playSileroTTS(botReply, () => {
         speaking = false;
@@ -303,43 +334,45 @@ async function playSileroTTS(text, onEnd) {
   talking = true;
   drawCloudWave();
   try {
-    // Формируем запрос к Silero API
+    // Оптимизированный запрос к Silero API
     const sileroPayload = {
       text: text,
       speaker: selectedVoice,
       lang: "ru",
       sample_rate: 24000,
       speed: selectedRate,
-      emotion: selectedEmotion
+      emotion: selectedEmotion,
+      format: 'wav' // Явно указываем формат для оптимизации
     };
     console.log('playSileroTTS fetch sileroPayload:', sileroPayload);
+    
     const resp = await fetch("/api/tts", {
       method: "POST",
       headers: {
-        "accept": "audio/mpeg",
+        "accept": "audio/wav",
         "Content-Type": "application/json"
       },
       body: JSON.stringify(sileroPayload)
     });
+    
     console.log('playSileroTTS Silero response status:', resp.status);
     if (!resp.ok) throw new Error("Ошибка Silero TTS API: " + resp.status);
+    
     const blob = await resp.blob();
     const audioUrl = URL.createObjectURL(blob);
     sileroAudio = new Audio(audioUrl);
+    
     sileroAudio.onended = sileroAudio.onerror = () => {
       talking = false;
       sileroAudio = null;
+      URL.revokeObjectURL(audioUrl); // Освобождаем память
       console.log('sileroAudio ended/errored');
       if (onEnd) onEnd();
     };
-    sileroAudio.play().then(() => {
-      console.log('sileroAudio playback started');
-    }).catch(e => {
-      console.error('sileroAudio.play() error:', e);
-      talking = false;
-      sileroAudio = null;
-      if (onEnd) onEnd();
-    });
+    
+    await sileroAudio.play();
+    console.log('sileroAudio playback started');
+    
   } catch (err) {
     talking = false;
     showError("Ошибка синтеза речи: " + err.message);

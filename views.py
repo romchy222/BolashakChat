@@ -64,57 +64,63 @@ def chat():
 
         start_time = time.time()
 
-        with current_app.app_context():
-            router = initialize_agent_router()
-            if agent_type:
-                # Поиск агента с нужным типом
-                for agent in router.agents:
-                        if getattr(agent, "agent_type", None) and (agent.agent_type == agent_type):
-                            result = agent.process_message(user_message, language)
-                            result['agent_type'] = agent.agent_type
-                            result['agent_name'] = agent.name
-                            result['confidence'] = 1.0
-                            break
-                else:
-                    # Если не найден — fallback на авто-выбор
-                    result = router.route_message(user_message, language)
+        # Initialize router within app context
+        router = initialize_agent_router()
+        
+        if agent_type:
+            # Поиск агента с нужным типом
+            for agent in router.agents:
+                if getattr(agent, "agent_type", None) and (agent.agent_type == agent_type):
+                    result = agent.process_message(user_message, language)
+                    result['agent_type'] = agent.agent_type
+                    result['agent_name'] = agent.name
+                    result['confidence'] = 1.0
+                    break
             else:
-                # Автоматический выбор агента
+                # Если не найден — fallback на авто-выбор
                 result = router.route_message(user_message, language)
+        else:
+            # Автоматический выбор агента
+            result = router.route_message(user_message, language)
 
-            response_time = time.time() - start_time
+        response_time = time.time() - start_time
 
-            user_query = UserQuery(
-                user_message=user_message,
-                bot_response=result['response'],
-                language=language,
-                response_time=response_time,
-                agent_type=result.get('agent_type'),
-                agent_name=result.get('agent_name'),
-                agent_confidence=result.get('confidence', 0.0),
-                context_used=result.get('context_used', False),
-                session_id=session.get('session_id', ''),
-                ip_address=request.remote_addr,
-                user_agent=request.headers.get('User-Agent', '')
-            )
+        # Create UserQuery within app context
+        user_query = UserQuery(
+            user_message=user_message,
+            bot_response=result['response'],
+            language=language,
+            response_time=response_time,
+            agent_type=result.get('agent_type'),
+            agent_name=result.get('agent_name'),
+            agent_confidence=result.get('confidence', 0.0),
+            context_used=result.get('context_used', False),
+            session_id=session.get('session_id', ''),
+            ip_address=request.remote_addr,
+            user_agent=request.headers.get('User-Agent', '')
+        )
 
+        try:
             db.session.add(user_query)
             db.session.commit()
+        except Exception as db_error:
+            logger.warning(f"Database error (continuing without saving): {str(db_error)}")
+            # Continue without saving to database
 
-            logger.info(
-                f"Chat response generated in {response_time:.2f}s "
-                f"by {result.get('agent_name', 'Unknown')} agent "
-                f"(confidence: {result.get('confidence', 0):.2f}) "
-                f"for language: {language}"
-            )
+        logger.info(
+            f"Chat response generated in {response_time:.2f}s "
+            f"by {result.get('agent_name', 'Unknown')} agent "
+            f"(confidence: {result.get('confidence', 0):.2f}) "
+            f"for language: {language}"
+        )
 
-            return jsonify({
-                'response': result['response'],
-                'response_time': response_time,
-                'agent_name': result.get('agent_name'),
-                'agent_type': result.get('agent_type'),
-                'confidence': result.get('confidence', 0.0)
-            })
+        return jsonify({
+            'response': result['response'],
+            'response_time': response_time,
+            'agent_name': result.get('agent_name'),
+            'agent_type': result.get('agent_type'),
+            'confidence': result.get('confidence', 0.0)
+        })
 
     except Exception as e:
         logger.error(f"Error in chat endpoint: {str(e)}")
