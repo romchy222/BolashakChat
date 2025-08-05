@@ -68,7 +68,36 @@ export function renderMessage(msg, chatHistory) {
     : msg.text;
 
   innerHTML += `<div class="message-content${msg.error ? " error" : ""}">${formatted}</div>`;
+  
+  // Add like/dislike buttons for bot messages (not for typing or error messages)
+  if (msg.who === "bot" && !msg.typing && !msg.error) {
+    innerHTML += `
+      <div class="message-actions">
+        <button class="like-btn" data-rating="like" title="Полезный ответ">
+          <span class="material-symbols-outlined">thumb_up</span>
+        </button>
+        <button class="dislike-btn" data-rating="dislike" title="Неполезный ответ">
+          <span class="material-symbols-outlined">thumb_down</span>
+        </button>
+        <button class="copy-btn" title="Копировать">⧉</button>
+      </div>
+    `;
+  } else if (msg.who === "bot" && !msg.typing) {
+    // Add only copy button for error messages
+    innerHTML += `
+      <div class="message-actions">
+        <button class="copy-btn" title="Копировать">⧉</button>
+      </div>
+    `;
+  }
+  
   bubble.innerHTML = innerHTML;
+  
+  // Store message ID for rating if it's a bot message
+  if (msg.who === "bot" && msg.id) {
+    bubble.setAttribute('data-message-id', msg.id);
+  }
+  
   chatHistory.appendChild(bubble);
   scrollDown(chatHistory, true);
 }

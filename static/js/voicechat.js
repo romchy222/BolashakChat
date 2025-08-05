@@ -291,7 +291,7 @@ if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
       const botReply = data.response || 'Извините, не удалось получить ответ.';
       setUI("speak");
       speaking = true;
-      playSileroTTS(botReply, () => {
+      playBrowserTTS(botReply, () => {
         speaking = false;
         setUI("ready");
         autoStartRecognition();
@@ -299,7 +299,7 @@ if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
     })
     .catch(err => {
       setUI("ready");
-      stopSileroPlayback();
+      stopBrowserTTS();
       showError("Ошибка сети: " + err.message);
       autoStartRecognition();
       console.error('fetch /api/chat error:', err);
@@ -311,72 +311,114 @@ if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
   console.error('SpeechRecognition not supported in this browser');
 }
 
-// ====== Silero TTS playback ======
-let sileroAudio = null;
-function stopSileroPlayback() {
-  if (sileroAudio) {
-    sileroAudio.pause();
-    sileroAudio.src = "";
-    sileroAudio = null;
+// ====== Browser Native TTS playback (Free, No Limits) ======
+let currentSpeech = null;
+
+function stopBrowserTTS() {
+  if (currentSpeech) {
+    window.speechSynthesis.cancel();
+    currentSpeech = null;
     talking = false;
-    console.log('stopSileroPlayback');
+    console.log('stopBrowserTTS: speech cancelled');
   }
 }
 
-async function playSileroTTS(text, onEnd) {
-  stopSileroPlayback();
+async function playBrowserTTS(text, onEnd) {
+  stopBrowserTTS();
   text = cleanTextForTTS(text);
   if (!text) {
-    console.warn('playSileroTTS: text is empty, skipping playback');
+    console.warn('playBrowserTTS: text is empty, skipping playback');
     if (onEnd) onEnd();
     return;
   }
+  
+  // Check if browser supports Speech Synthesis
+  if (!('speechSynthesis' in window)) {
+    showError("Ваш браузер не поддерживает синтез речи");
+    if (onEnd) onEnd();
+    return;
+  }
+  
   talking = true;
   drawCloudWave();
+  
   try {
-    // Оптимизированный запрос к Silero API
-    const sileroPayload = {
+    // Get TTS config from server (for consistency, though we could skip this)
+    const configPayload = {
       text: text,
       speaker: selectedVoice,
       lang: "ru",
-      sample_rate: 24000,
       speed: selectedRate,
-      emotion: selectedEmotion,
-      format: 'wav' // Явно указываем формат для оптимизации
+      emotion: selectedEmotion
     };
-    console.log('playSileroTTS fetch sileroPayload:', sileroPayload);
+    
+    console.log('playBrowserTTS config payload:', configPayload);
     
     const resp = await fetch("/api/tts", {
       method: "POST",
       headers: {
-        "accept": "audio/wav",
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(sileroPayload)
+      body: JSON.stringify(configPayload)
     });
     
-    console.log('playSileroTTS Silero response status:', resp.status);
-    if (!resp.ok) throw new Error("Ошибка Silero TTS API: " + resp.status);
+    const result = await resp.json();
+    console.log('playBrowserTTS server response:', result);
     
-    const blob = await resp.blob();
-    const audioUrl = URL.createObjectURL(blob);
-    sileroAudio = new Audio(audioUrl);
+    // Use browser's native Speech Synthesis API
+    currentSpeech = new SpeechSynthesisUtterance(text);
     
-    sileroAudio.onended = sileroAudio.onerror = () => {
+    // Configure speech parameters
+    currentSpeech.lang = 'ru-RU';
+    currentSpeech.rate = selectedRate;
+    currentSpeech.pitch = 1.0;
+    currentSpeech.volume = 1.0;
+    
+    // Try to find a suitable voice
+    const voices = speechSynthesis.getVoices();
+    const russianVoice = voices.find(voice => 
+      voice.lang.startsWith('ru') || 
+      voice.name.toLowerCase().includes('rus') ||
+      voice.name.toLowerCase().includes('anna') ||
+      voice.name.toLowerCase().includes('pavel')
+    );
+    
+    if (russianVoice) {
+      currentSpeech.voice = russianVoice;
+      console.log('Using voice:', russianVoice.name);
+    } else {
+      console.log('No Russian voice found, using default');
+    }
+    
+    // Set up event handlers
+    currentSpeech.onstart = () => {
+      console.log('Browser TTS started');
+    };
+    
+    currentSpeech.onend = () => {
       talking = false;
-      sileroAudio = null;
-      URL.revokeObjectURL(audioUrl); // Освобождаем память
-      console.log('sileroAudio ended/errored');
+      currentSpeech = null;
+      console.log('Browser TTS ended');
       if (onEnd) onEnd();
     };
     
-    await sileroAudio.play();
-    console.log('sileroAudio playback started');
+    currentSpeech.onerror = (event) => {
+      talking = false;
+      currentSpeech = null;
+      console.error('Browser TTS error:', event);
+      showError("Ошибка воспроизведения речи: " + event.error);
+      if (onEnd) onEnd();
+    };
+    
+    // Start speech synthesis
+    speechSynthesis.speak(currentSpeech);
+    console.log('Browser TTS speech started');
     
   } catch (err) {
     talking = false;
+    currentSpeech = null;
     showError("Ошибка синтеза речи: " + err.message);
-    console.error('playSileroTTS error:', err);
+    console.error('playBrowserTTS error:', err);
     if (onEnd) onEnd();
   }
 }
@@ -393,7 +435,7 @@ muteBtn.onclick = () => {
   if (muted && recognizing) recognition.stop();
   setUI("ready");
   if (!muted) autoStartRecognition();
-  stopSileroPlayback();
+  stopBrowserTTS();
 };
 closeBtn.onclick = () => {
   console.log('closeBtn.onclick');
@@ -402,5 +444,5 @@ closeBtn.onclick = () => {
   updateMuteUI();
   if (recognizing) recognition.stop();
   setUI("ready");
-  stopSileroPlayback();
+  stopBrowserTTS();
 };
