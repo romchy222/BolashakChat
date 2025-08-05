@@ -117,9 +117,12 @@
           <button type="button" id="voice-btn" class="voice-btn" title="Голосовой ввод">
             <span class="voice-anim"></span>
             <span class="material-symbols-outlined">
-            graphic_eq</span>
+              mic
+           </span>
           </button>
-          <button type="button" id="add-btn" class="add-btn" title="Голосовой чат"><span class="material-symbols-outlined">voice_chat</span>
+          <button type="button" id="add-btn" class="add-btn" title="Голосовой чат"><span class="material-symbols-outlined">
+             graphic_eq
+            </span>
           </button>
           <input type="text" id="chat-input" data-i18n-placeholder="placeholder" placeholder="Введите сообщение..." autocomplete="off" />
           <button type="submit" class="send-btn" aria-label="Отправить">
@@ -130,13 +133,45 @@
         </form>
       </div>
     </div>
-    <div id="voice-chat-overlay" class="voice-chat-overlay hidden">
-      <div class="voice-circle"></div>
-      <button class="voice-exit-btn" title="Закрыть голосовой режим">✖</button>
+    <!-- Overlay -->
+    <div id="voice-overlay" class="voice-overlay hidden">
+      <div class="voice-circle">
+        <canvas id="voice-visual" width="180" height="180"></canvas>
+      </div>
+      <div class="voice-controls">
+        <div class="voice-btn-row">
+          <button id="mute-btn" class="voice-btn mute" title="Mute/Unmute">
+            <span class="material-symbols-outlined" id="mute-icon">mic</span>
+          </button>
+          <button id="close-btn" class="voice-btn stop" title="Закрыть">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <span class="voice-hint" id="voice-hint">Голосовой чат активен</span>
+      </div>
+      <!-- Добавьте в overlay -->
+      <div style="margin:10px 0;">
+        <label>Голос:
+          <select id="voice-select"></select>
+        </label>
+        <label> Скорость:
+          <input id="rate-input" type="range" min="0.5" max="2" step="0.05" value="1">
+          <span id="rate-label">1</span>
+        </label>
+        <label> Эмоция:
+          <select id="emotion-select">
+            <option value="neutral">Нейтрально</option>
+            <option value="good">Дружелюбно</option>
+            <option value="evil">Серьёзно</option>
+            <option value="sad">Грустно</option>
+          </select>
+        </label>
+      </div>
+
     </div>
 
   </main>
-  <script type="module" src="{{ url_for('static', filename='js/voice.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='js/voicechat.js') }}"></script>
   <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
   <script type="module" src="{{ url_for('static', filename='js/i18n.js') }}"></script>
   <script type="module" src="{{ url_for('static', filename='js/localization.js') }}"></script>

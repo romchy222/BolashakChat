@@ -1,7 +1,12 @@
 # Импорт необходимых модулей
 import time
 import logging
-from flask import Blueprint, render_template, request, jsonify, session
+from flask import Blueprint, render_template, request, jsonify, session, Response
+import requests
+from flask import Response
+import requests
+import base64
+
 
 # Настройка логирования
 logger = logging.getLogger(__name__)
@@ -137,6 +142,29 @@ def get_agents():
     except Exception as e:
         logger.error(f"Error getting agents info: {str(e)}")
         return jsonify({'error': 'Failed to get agents information'}), 500
+
+
+@main_bp.route('/api/tts', methods=['POST'])
+def tts_proxy():
+    try:
+        data = request.get_json(force=True)
+        # Можно добавить свой api_token, если требуется
+        
+        data['format'] = 'wav'  # для браузера лучше wav или mp3, не raw!
+        silero_url = 'https://api.silero.ai/voice'
+
+        silero_resp = requests.post(silero_url, json=data)
+        if not silero_resp.ok:
+            print('Silero error:', silero_resp.status_code, silero_resp.text)
+            return Response('Silero error', status=500)
+        silero_json = silero_resp.json()
+        audio_base64 = silero_json['results'][0]['audio']
+        audio_bytes = base64.b64decode(audio_base64)
+        # wav/mp3 лучше для браузерного Audio
+        return Response(audio_bytes, mimetype='audio/wav')
+    except Exception as e:
+        print('tts_proxy error:', e)
+        return Response('Failed to fetch from Silero', status=500)
 
 
 @main_bp.route('/api/deployment-readiness')
