@@ -34,8 +34,8 @@ class BaseAgent(ABC):
             # Get agent-specific system prompt
             system_prompt = self.get_system_prompt(language)
             
-            # Get context from FAQ or other sources
-            context = ""
+            # Get agent-specific context from knowledge base
+            context = self.get_agent_context(message, language)
             
             # Use agent-specific system prompt for this message
             response = self.mistral.get_response_with_system_prompt(
@@ -45,7 +45,8 @@ class BaseAgent(ABC):
                 'response': response,
                 'confidence': self.can_handle(message, language),
                 'agent_type': self.agent_type,
-                'agent_name': self.name
+                'agent_name': self.name,
+                'context_used': bool(context)
             }
         except Exception as e:
             logger.error(f"Error in {self.name} agent: {str(e)}")
@@ -53,8 +54,52 @@ class BaseAgent(ABC):
                 'response': f"Извините, возникла ошибка при обработке запроса по теме '{self.description}'.",
                 'confidence': 0.1,
                 'agent_type': self.agent_type,
-                'agent_name': self.name
+                'agent_name': self.name,
+                'context_used': False
             }
+    
+    def get_agent_context(self, message: str, language: str = "ru") -> str:
+        """Get agent-specific context from knowledge base"""
+        try:
+            from models import AgentKnowledgeBase
+            from app import db
+            
+            # Search for relevant knowledge entries for this agent
+            knowledge_entries = AgentKnowledgeBase.query.filter_by(
+                agent_type=self.agent_type,
+                is_active=True
+            ).order_by(AgentKnowledgeBase.priority.asc()).all()
+            
+            if not knowledge_entries:
+                return ""
+            
+            # Build context from relevant entries
+            context_parts = []
+            message_lower = message.lower()
+            
+            for entry in knowledge_entries:
+                # Check if keywords match the message
+                if entry.keywords:
+                    keywords = [k.strip().lower() for k in entry.keywords.split(',')]
+                    if any(keyword in message_lower for keyword in keywords):
+                        content = entry.content_ru if language == 'ru' else entry.content_kz
+                        context_parts.append(f"**{entry.title}**\n{content}")
+                        
+                        # Limit context to prevent too long prompts
+                        if len(context_parts) >= 3:
+                            break
+            
+            # If no keyword matches, include high-priority general entries
+            if not context_parts:
+                for entry in knowledge_entries[:2]:  # Top 2 priority entries
+                    content = entry.content_ru if language == 'ru' else entry.content_kz
+                    context_parts.append(f"**{entry.title}**\n{content}")
+            
+            return "\n\n".join(context_parts)
+            
+        except Exception as e:
+            logger.error(f"Error getting agent context: {str(e)}")
+            return ""
 
 class AIAssistantAgent(BaseAgent):
     def __init__(self):

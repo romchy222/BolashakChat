@@ -1,6 +1,7 @@
 # Импорт необходимых модулей
 import time
 import logging
+from datetime import datetime
 from flask import Blueprint, render_template, request, jsonify, session, Response
 import requests
 from flask import Response
@@ -148,6 +149,134 @@ def get_agents():
     except Exception as e:
         logger.error(f"Error getting agents info: {str(e)}")
         return jsonify({'error': 'Failed to get agents information'}), 500
+
+
+@main_bp.route('/api/rate/<int:query_id>', methods=['POST'])
+def rate_response(query_id):
+    """Rate a bot response with like/dislike"""
+    try:
+        from models import UserQuery
+        from app import db
+        
+        data = request.get_json()
+        if not data or 'rating' not in data:
+            return jsonify({'error': 'Rating not provided'}), 400
+            
+        rating = data['rating']
+        if rating not in ['like', 'dislike']:
+            return jsonify({'error': 'Invalid rating. Must be "like" or "dislike"'}), 400
+            
+        # Find the query
+        query = UserQuery.query.get(query_id)
+        if not query:
+            return jsonify({'error': 'Query not found'}), 404
+            
+        # Update rating
+        query.user_rating = rating
+        query.rating_timestamp = datetime.utcnow()
+        
+        try:
+            db.session.commit()
+            logger.info(f"Query {query_id} rated as {rating}")
+            return jsonify({
+                'success': True,
+                'rating': rating,
+                'query_id': query_id
+            })
+        except Exception as db_error:
+            logger.error(f"Database error saving rating: {str(db_error)}")
+            return jsonify({'error': 'Failed to save rating'}), 500
+            
+    except Exception as e:
+        logger.error(f"Error rating response: {str(e)}")
+        return jsonify({'error': 'Failed to rate response'}), 500
+
+
+# Voice chat endpoints
+@main_bp.route('/api/voice/start-session', methods=['POST'])
+def start_voice_session():
+    """Start a new voice chat session"""
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id', 'anonymous')
+        language = data.get('language', 'ru')
+        
+        # Generate session ID
+        import uuid
+        session_id = str(uuid.uuid4())
+        
+        # Store session info (could be in database in production)
+        session['voice_session_id'] = session_id
+        session['voice_language'] = language
+        session['voice_user_id'] = user_id
+        
+        logger.info(f"Started voice session {session_id} for user {user_id}")
+        
+        return jsonify({
+            'session_id': session_id,
+            'status': 'active',
+            'language': language
+        })
+        
+    except Exception as e:
+        logger.error(f"Error starting voice session: {str(e)}")
+        return jsonify({'error': 'Failed to start voice session'}), 500
+
+
+@main_bp.route('/api/voice/process', methods=['POST'])
+def process_voice_message():
+    """Process voice message (placeholder for actual speech-to-text integration)"""
+    try:
+        data = request.get_json()
+        session_id = data.get('session_id')
+        text_message = data.get('text')  # In real implementation, this would be audio data
+        
+        if not session_id or session_id != session.get('voice_session_id'):
+            return jsonify({'error': 'Invalid session'}), 401
+            
+        if not text_message:
+            return jsonify({'error': 'No message provided'}), 400
+            
+        # Use existing chat processing
+        language = session.get('voice_language', 'ru')
+        
+        # Process through existing chat system
+        router = initialize_agent_router()
+        result = router.route_message(text_message, language)
+        
+        # Log the voice interaction
+        from models import UserQuery
+        from app import db
+        
+        user_query = UserQuery(
+            user_message=text_message,
+            bot_response=result['response'],
+            language=language,
+            agent_type=result.get('agent_type'),
+            agent_name=result.get('agent_name'),
+            agent_confidence=result.get('confidence', 0.0),
+            session_id=session_id,
+            ip_address=request.remote_addr,
+            user_agent='Voice Chat API'
+        )
+        
+        try:
+            db.session.add(user_query)
+            db.session.commit()
+            query_id = user_query.id
+        except Exception:
+            query_id = None
+            
+        return jsonify({
+            'response': result['response'],
+            'agent_name': result.get('agent_name'),
+            'query_id': query_id,
+            'session_id': session_id
+        })
+        
+    except Exception as e:
+        logger.error(f"Error processing voice message: {str(e)}")
+        return jsonify({'error': 'Failed to process voice message'}), 500
 
 
 @main_bp.route('/api/tts', methods=['POST'])

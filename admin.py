@@ -605,3 +605,211 @@ def analytics_summary():
     except Exception as e:
         logger.error(f"Error getting analytics summary: {str(e)}")
         return jsonify({'error': 'Failed to get summary data'}), 500
+
+
+# =====================
+# Agent Knowledge Base Management
+# =====================
+
+@admin_bp.route('/agent-knowledge')
+@admin_required
+def agent_knowledge():
+    """Manage agent-specific knowledge bases"""
+    try:
+        from models import AgentKnowledgeBase
+        from config import AgentConfig
+        
+        page = request.args.get('page', 1, type=int)
+        agent_type = request.args.get('agent_type', '')
+        
+        query = AgentKnowledgeBase.query
+        if agent_type:
+            query = query.filter_by(agent_type=agent_type)
+            
+        knowledge_entries = query.order_by(
+            AgentKnowledgeBase.priority.asc(),
+            AgentKnowledgeBase.created_at.desc()
+        ).paginate(page=page, per_page=20, error_out=False)
+        
+        agent_types = AgentConfig.AGENT_TYPES
+        
+        return render_template('admin/agent_knowledge.html',
+                             knowledge_entries=knowledge_entries,
+                             agent_types=agent_types,
+                             selected_agent=agent_type)
+                             
+    except Exception as e:
+        logger.error(f"Error in agent knowledge page: {str(e)}")
+        flash('Ошибка при загрузке базы знаний агентов', 'error')
+        return render_template('admin/agent_knowledge.html', 
+                             knowledge_entries=None, 
+                             agent_types={})
+
+@admin_bp.route('/agent-knowledge/add', methods=['POST'])
+@admin_required
+def add_agent_knowledge():
+    """Add new agent knowledge entry"""
+    try:
+        from models import AgentKnowledgeBase
+        from app import db
+        
+        agent_type = request.form.get('agent_type', '').strip()
+        title = request.form.get('title', '').strip()
+        content_ru = request.form.get('content_ru', '').strip()
+        content_kz = request.form.get('content_kz', '').strip()
+        keywords = request.form.get('keywords', '').strip()
+        priority = request.form.get('priority', 1, type=int)
+        
+        if not all([agent_type, title, content_ru, content_kz]):
+            flash('Обязательные поля: тип агента, заголовок, содержимое на двух языках', 'error')
+            return redirect(url_for('admin.agent_knowledge'))
+            
+        admin_id = session.get('admin_id')
+        if not admin_id:
+            flash('Ошибка авторизации', 'error')
+            return redirect(url_for('admin.agent_knowledge'))
+            
+        knowledge = AgentKnowledgeBase(
+            agent_type=agent_type,
+            title=title,
+            content_ru=content_ru,
+            content_kz=content_kz,
+            keywords=keywords,
+            priority=priority,
+            created_by=admin_id
+        )
+        
+        db.session.add(knowledge)
+        db.session.commit()
+        flash('Знание успешно добавлено в базу агента', 'success')
+        
+    except Exception as e:
+        logger.error(f"Error adding agent knowledge: {str(e)}")
+        flash('Ошибка при добавлении знания', 'error')
+        
+    return redirect(url_for('admin.agent_knowledge'))
+
+@admin_bp.route('/agent-knowledge/edit/<int:knowledge_id>', methods=['POST'])
+@admin_required
+def edit_agent_knowledge(knowledge_id):
+    """Edit agent knowledge entry"""
+    try:
+        from models import AgentKnowledgeBase
+        from app import db
+        
+        knowledge = AgentKnowledgeBase.query.get(knowledge_id)
+        if not knowledge:
+            flash('Запись не найдена', 'error')
+            return redirect(url_for('admin.agent_knowledge'))
+            
+        knowledge.title = request.form.get('title', '').strip()
+        knowledge.content_ru = request.form.get('content_ru', '').strip()
+        knowledge.content_kz = request.form.get('content_kz', '').strip()
+        knowledge.keywords = request.form.get('keywords', '').strip()
+        knowledge.priority = request.form.get('priority', 1, type=int)
+        knowledge.is_active = request.form.get('is_active') == 'on'
+        
+        db.session.commit()
+        flash('Знание успешно обновлено', 'success')
+        
+    except Exception as e:
+        logger.error(f"Error editing agent knowledge: {str(e)}")
+        flash('Ошибка при редактировании знания', 'error')
+        
+    return redirect(url_for('admin.agent_knowledge'))
+
+@admin_bp.route('/agent-knowledge/delete/<int:knowledge_id>', methods=['POST'])
+@admin_required
+def delete_agent_knowledge(knowledge_id):
+    """Delete agent knowledge entry"""
+    try:
+        from models import AgentKnowledgeBase
+        from app import db
+        
+        knowledge = AgentKnowledgeBase.query.get(knowledge_id)
+        if knowledge:
+            knowledge.is_active = False
+            db.session.commit()
+            flash('Знание деактивировано', 'success')
+        else:
+            flash('Запись не найдена', 'error')
+            
+    except Exception as e:
+        logger.error(f"Error deleting agent knowledge: {str(e)}")
+        flash('Ошибка при удалении знания', 'error')
+        
+    return redirect(url_for('admin.agent_knowledge'))
+
+
+# =====================
+# Enhanced Analytics with Ratings
+# =====================
+
+@admin_bp.route('/api/analytics/ratings')
+@admin_required
+def get_ratings_analytics():
+    """Get detailed rating statistics"""
+    try:
+        from models import UserQuery
+        from sqlalchemy import func
+        
+        # Rating distribution
+        rating_stats = db.session.query(
+            UserQuery.user_rating,
+            func.count(UserQuery.id).label('count')
+        ).filter(
+            UserQuery.user_rating.isnot(None)
+        ).group_by(UserQuery.user_rating).all()
+        
+        # Rating by agent
+        agent_ratings = db.session.query(
+            UserQuery.agent_type,
+            UserQuery.user_rating,
+            func.count(UserQuery.id).label('count')
+        ).filter(
+            UserQuery.user_rating.isnot(None),
+            UserQuery.agent_type.isnot(None)
+        ).group_by(UserQuery.agent_type, UserQuery.user_rating).all()
+        
+        # Daily rating trends (last 30 days)
+        from datetime import datetime, timedelta
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        
+        daily_ratings = db.session.query(
+            func.date(UserQuery.created_at).label('date'),
+            UserQuery.user_rating,
+            func.count(UserQuery.id).label('count')
+        ).filter(
+            UserQuery.created_at >= thirty_days_ago,
+            UserQuery.user_rating.isnot(None)
+        ).group_by(
+            func.date(UserQuery.created_at),
+            UserQuery.user_rating
+        ).all()
+        
+        return jsonify({
+            'rating_distribution': [
+                {'rating': r.user_rating, 'count': r.count}
+                for r in rating_stats
+            ],
+            'agent_ratings': [
+                {
+                    'agent_type': r.agent_type,
+                    'rating': r.user_rating,
+                    'count': r.count
+                }
+                for r in agent_ratings
+            ],
+            'daily_trends': [
+                {
+                    'date': str(r.date),
+                    'rating': r.user_rating,
+                    'count': r.count
+                }
+                for r in daily_ratings
+            ]
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting rating analytics: {str(e)}")
+        return jsonify({'error': 'Failed to get rating analytics'}), 500
