@@ -5,9 +5,14 @@ robot_2
 </span></span>`;
 export const TYPING_INDICATOR = `<span class="typing-indicator"><b>Бот печатает</b><span class="typing-dots"><span>.</span><span>.</span>.</span></span>`;
 export const SUGGESTIONS = [
-  // "Как поступить?",
-  // "Сроки подачи документов",
-  // "Какие программы есть?"
+  "Как поступить в университет?",
+  "Какие документы нужны для поступления?",
+  "Сроки подачи документов",
+  "Какие специальности доступны?",
+  "Стоимость обучения",
+  "Общежитие и проживание",
+  "Стипендии и гранты",
+  "Расписание занятий"
 ];
 export const LS_KEY = "bolashak_chat_history_v1";
 

@@ -120,7 +120,8 @@ def chat():
             'response_time': response_time,
             'agent_name': result.get('agent_name'),
             'agent_type': result.get('agent_type'),
-            'confidence': result.get('confidence', 0.0)
+            'confidence': result.get('confidence', 0.0),
+            'query_id': user_query.id  # Include query ID for rating functionality
         })
 
     except Exception as e:
@@ -281,25 +282,40 @@ def process_voice_message():
 
 @main_bp.route('/api/tts', methods=['POST'])
 def tts_proxy():
+    """
+    Free TTS endpoint using browser's native speech synthesis
+    Returns instructions for client-side TTS instead of server-side processing
+    """
     try:
         data = request.get_json(force=True)
-        # Можно добавить свой api_token, если требуется
+        text = data.get('text', '')
+        speaker = data.get('speaker', 'default')
+        lang = data.get('lang', 'ru')
+        speed = data.get('speed', 1.0)
+        emotion = data.get('emotion', 'neutral')
         
-        data['format'] = 'wav'  # для браузера лучше wav или mp3, не raw!
-        silero_url = 'https://api.silero.ai/voice'
-
-        silero_resp = requests.post(silero_url, json=data)
-        if not silero_resp.ok:
-            print('Silero error:', silero_resp.status_code, silero_resp.text)
-            return Response('Silero error', status=500)
-        silero_json = silero_resp.json()
-        audio_base64 = silero_json['results'][0]['audio']
-        audio_bytes = base64.b64decode(audio_base64)
-        # wav/mp3 лучше для браузерного Audio
-        return Response(audio_bytes, mimetype='audio/wav')
+        # Instead of server-side TTS, return configuration for client-side Web Speech API
+        tts_config = {
+            'text': text,
+            'lang': 'ru-RU' if lang == 'ru' else 'en-US',
+            'rate': float(speed),
+            'pitch': 1.0,
+            'volume': 1.0,
+            'voice_preference': speaker,
+            'use_browser_tts': True
+        }
+        
+        logger.info(f"TTS config generated for text: {text[:50]}... (lang: {lang}, speed: {speed})")
+        
+        return jsonify({
+            'success': True,
+            'config': tts_config,
+            'message': 'Use browser TTS with provided config'
+        })
+        
     except Exception as e:
-        print('tts_proxy error:', e)
-        return Response('Failed to fetch from Silero', status=500)
+        logger.error(f"TTS config error: {str(e)}")
+        return jsonify({'error': 'Failed to generate TTS config'}), 500
 
 
 @main_bp.route('/api/deployment-readiness')

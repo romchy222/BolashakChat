@@ -1101,4 +1101,78 @@ body.theme-dark .message-content a:hover { color: #dbeafe; }
   transform:rotate(180deg);
 }
 
+}
+
+/* ========== Message Actions & Rating System ========== */
+.message-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.chat-bubble:hover .message-actions {
+  opacity: 1;
+}
+
+.like-btn, .dislike-btn, .copy-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 4px 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--main-fg);
+}
+
+.like-btn:hover, .dislike-btn:hover, .copy-btn:hover {
+  background: var(--gray);
+  transform: scale(1.05);
+}
+
+.like-btn.selected.like-selected {
+  background: #10b981;
+  color: white;
+  border-color: #10b981;
+}
+
+.dislike-btn.selected.dislike-selected {
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
+}
+
+.like-btn:disabled, .dislike-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.rating-success {
+  color: #10b981;
+  font-size: 12px;
+  font-weight: 500;
+  animation: fadeInOut 2s ease-in-out;
+}
+
+.rating-error {
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 500;
+  animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(10px); }
+  20% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
 .hidden { display: none !important; }

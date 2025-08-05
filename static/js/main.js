@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
       if (data.error) {
         appendMessage({ text: data.error, who: "bot", error: true }, messages, chatHistory, (msg, ch) => renderMessage(msg, ch));
       } else {
-        await typeBotMessage(data.response || "", { who: "bot" }, messages, chatHistory);
+        await typeBotMessage(data.response || "", { who: "bot", id: data.query_id }, messages, chatHistory);
       }
     } catch (err) {
       removeTyping(chatHistory);
@@ -148,9 +148,91 @@ document.addEventListener('DOMContentLoaded', function () {
       e.target.textContent = "✅";
       setTimeout(() => e.target.textContent = "⧉", 1200);
     }
+    
+    // Handle like/dislike buttons
+    if (e.target.classList.contains('like-btn') || e.target.classList.contains('dislike-btn') || 
+        e.target.closest('.like-btn') || e.target.closest('.dislike-btn')) {
+      
+      const button = e.target.classList.contains('like-btn') || e.target.classList.contains('dislike-btn') 
+        ? e.target 
+        : e.target.closest('.like-btn') || e.target.closest('.dislike-btn');
+      
+      const rating = button.dataset.rating || button.closest('[data-rating]')?.dataset.rating;
+      const messageBubble = button.closest('.chat-bubble');
+      const messageId = messageBubble?.dataset.messageId;
+      
+      if (messageId && rating) {
+        handleRating(messageId, rating, button);
+      }
+    }
   });
 
   setupBotStatus(botStatus);
+
+  // Handle rating functionality
+  async function handleRating(messageId, rating, buttonElement) {
+    try {
+      // Disable all rating buttons in this message
+      const messageBubble = buttonElement.closest('.chat-bubble');
+      const ratingButtons = messageBubble.querySelectorAll('.like-btn, .dislike-btn');
+      ratingButtons.forEach(btn => btn.disabled = true);
+      
+      const response = await fetch(`/api/rate/${messageId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rating })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Visual feedback - highlight the selected rating
+        ratingButtons.forEach(btn => {
+          btn.classList.remove('selected', 'like-selected', 'dislike-selected');
+          if (btn.dataset.rating === rating) {
+            btn.classList.add('selected', `${rating}-selected`);
+          }
+        });
+        
+        // Show success message briefly
+        const actionsDiv = buttonElement.closest('.message-actions');
+        const successMsg = document.createElement('span');
+        successMsg.className = 'rating-success';
+        successMsg.textContent = rating === 'like' ? '👍 Спасибо!' : '👎 Принято';
+        actionsDiv.appendChild(successMsg);
+        
+        setTimeout(() => {
+          if (successMsg.parentNode) {
+            successMsg.remove();
+          }
+        }, 2000);
+        
+      } else {
+        throw new Error(result.error || 'Failed to save rating');
+      }
+      
+    } catch (error) {
+      console.error('Rating error:', error);
+      
+      // Re-enable buttons on error
+      const messageBubble = buttonElement.closest('.chat-bubble');
+      const ratingButtons = messageBubble.querySelectorAll('.like-btn, .dislike-btn');
+      ratingButtons.forEach(btn => btn.disabled = false);
+      
+      // Show error message
+      const actionsDiv = buttonElement.closest('.message-actions');
+      const errorMsg = document.createElement('span');
+      errorMsg.className = 'rating-error';
+      errorMsg.textContent = '❌ Ошибка оценки';
+      actionsDiv.appendChild(errorMsg);
+      
+      setTimeout(() => {
+        if (errorMsg.parentNode) {
+          errorMsg.remove();
+        }
+      }, 2000);
+    }
+  }
 
   chatHistory.addEventListener('dblclick', () => {
     if (confirm("Сбросить историю чата?")) {
