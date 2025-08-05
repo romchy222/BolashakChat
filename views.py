@@ -1,9 +1,8 @@
 # Импорт необходимых модулей
 import time
 import logging
+import asyncio
 from flask import Blueprint, render_template, request, jsonify, session, Response
-import requests
-from flask import Response
 import requests
 import base64
 
@@ -151,26 +150,78 @@ def get_agents():
 
 
 @main_bp.route('/api/tts', methods=['POST'])
-def tts_proxy():
+def tts_enhanced():
+    """
+    Enhanced TTS endpoint with multiple providers support
+    Улучшенный TTS с поддержкой нескольких провайдеров
+    """
     try:
-        data = request.get_json(force=True)
-        # Можно добавить свой api_token, если требуется
+        from tts_service import tts_service
         
-        data['format'] = 'wav'  # для браузера лучше wav или mp3, не raw!
-        silero_url = 'https://api.silero.ai/voice'
-
-        silero_resp = requests.post(silero_url, json=data)
-        if not silero_resp.ok:
-            print('Silero error:', silero_resp.status_code, silero_resp.text)
-            return Response('Silero error', status=500)
-        silero_json = silero_resp.json()
-        audio_base64 = silero_json['results'][0]['audio']
-        audio_bytes = base64.b64decode(audio_base64)
-        # wav/mp3 лучше для браузерного Audio
-        return Response(audio_bytes, mimetype='audio/wav')
+        data = request.get_json(force=True)
+        text = data.get('text', '')
+        voice_id = data.get('speaker', 'baya')  # Совместимость со старым API
+        speed = float(data.get('speed', 1.0))
+        emotion = data.get('emotion', 'neutral')
+        output_format = data.get('format', 'wav')
+        
+        if not text:
+            return Response('Text is required', status=400)
+        
+        # Синтезируем речь (выполняем асинхронную функцию в событийной петле)
+        try:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            audio_data = loop.run_until_complete(
+                tts_service.synthesize(
+                    text=text,
+                    voice_id=voice_id,
+                    speed=speed,
+                    emotion=emotion,
+                    output_format=output_format
+                )
+            )
+        finally:
+            loop.close()
+        
+        if audio_data:
+            # Определяем MIME тип
+            mimetype = 'audio/wav' if output_format == 'wav' else 'audio/mpeg'
+            
+            return Response(
+                audio_data, 
+                mimetype=mimetype,
+                headers={
+                    'Cache-Control': 'public, max-age=3600',  # Кэшируем на час
+                    'X-TTS-Quality': 'enhanced'
+                }
+            )
+        else:
+            return Response('TTS synthesis failed', status=500)
+            
     except Exception as e:
-        print('tts_proxy error:', e)
-        return Response('Failed to fetch from Silero', status=500)
+        logger.error(f'Enhanced TTS error: {e}')
+        return Response('TTS service unavailable', status=500)
+
+
+@main_bp.route('/api/tts/voices', methods=['GET'])
+def get_tts_voices():
+    """
+    Get available TTS voices
+    Получить список доступных голосов
+    """
+    try:
+        from tts_service import tts_service
+        voices = tts_service.get_voices()
+        return jsonify({
+            'voices': voices,
+            'default_voice': 'baya',
+            'supported_languages': ['ru', 'en'],
+            'supported_emotions': ['neutral', 'good', 'evil', 'sad']
+        })
+    except Exception as e:
+        logging.error(f'Error getting voices: {e}')
+        return jsonify({'error': 'Failed to get voices'}), 500
 
 
 @main_bp.route('/api/deployment-readiness')

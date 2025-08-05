@@ -133,48 +133,65 @@
         </form>
       </div>
     </div>
-    <!-- Overlay -->
+    <!-- Enhanced Voice Chat Overlay -->
     <div id="voice-overlay" class="voice-overlay hidden">
-      <div class="voice-circle">
-        <canvas id="voice-visual" width="180" height="180"></canvas>
+      <!-- Voice Status Indicator -->
+      <div class="voice-status" id="voice-status">
+        <div class="voice-status-dot"></div>
+        <span id="voice-status-text">Готов к общению</span>
       </div>
+
+      <!-- Main Voice Visualizer -->
+      <div class="voice-circle" id="voice-circle">
+        <canvas id="voice-visual" width="200" height="200"></canvas>
+      </div>
+
+      <!-- Voice Settings Panel -->
+      <div class="voice-settings-panel">
+        <h3>🎙️ Настройки голосового чата</h3>
+        
+        <div class="voice-setting-group">
+          <label for="agent-select">🤖 AI Агент:</label>
+          <select id="agent-select"></select>
+        </div>
+
+        <div class="voice-setting-group">
+          <label for="voice-select">🗣️ Голос:</label>
+          <select id="voice-select"></select>
+        </div>
+
+        <div class="voice-setting-group">
+          <label for="rate-input">⚡ Скорость: <span id="rate-label" class="range-value">1.0</span></label>
+          <input id="rate-input" type="range" min="0.5" max="2" step="0.1" value="1">
+        </div>
+
+        <div class="voice-setting-group">
+          <label for="emotion-select">😊 Эмоция:</label>
+          <select id="emotion-select">
+            <option value="neutral">😐 Нейтрально</option>
+            <option value="good">😊 Дружелюбно</option>
+            <option value="evil">😤 Серьёзно</option>
+            <option value="sad">😔 Грустно</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Voice Controls -->
       <div class="voice-controls">
         <div class="voice-btn-row">
-          <button id="mute-btn" class="voice-btn mute" title="Mute/Unmute">
+          <button id="mute-btn" class="voice-btn mute" title="Микрофон вкл/выкл">
             <span class="material-symbols-outlined" id="mute-icon">mic</span>
           </button>
-          <button id="close-btn" class="voice-btn stop" title="Закрыть">
+          <button id="close-btn" class="voice-btn stop" title="Закрыть голосовой чат">
             <span class="material-symbols-outlined">close</span>
           </button>
         </div>
-        <span class="voice-hint" id="voice-hint">Голосовой чат активен</span>
+        <div class="voice-hint" id="voice-hint">Нажмите на микрофон и говорите</div>
       </div>
-      <!-- Настройки голоса и агента -->
-      <div style="margin:10px 0;">
-        <label>Агент:
-          <select id="agent-select"></select>
-        </label>
-        <label>Голос:
-          <select id="voice-select"></select>
-        </label>
-        <label> Скорость:
-          <input id="rate-input" type="range" min="0.5" max="2" step="0.05" value="1">
-          <span id="rate-label">1</span>
-        </label>
-        <label> Эмоция:
-          <select id="emotion-select">
-            <option value="neutral">Нейтрально</option>
-            <option value="good">Дружелюбно</option>
-            <option value="evil">Серьёзно</option>
-            <option value="sad">Грустно</option>
-          </select>
-        </label>
-      </div>
-
     </div>
 
   </main>
-  <script type="module" src="{{ url_for('static', filename='js/voicechat.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='js/enhanced-voicechat.js') }}"></script>
   <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
   <script type="module" src="{{ url_for('static', filename='js/i18n.js') }}"></script>
   <script type="module" src="{{ url_for('static', filename='js/localization.js') }}"></script>
