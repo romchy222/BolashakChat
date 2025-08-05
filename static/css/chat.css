@@ -648,6 +648,105 @@ body.theme-dark .main-content {
 button:active {
   transform: scale(0.96);
 }
+
+/* ========== Улучшения для рейтинговой системы ========== */
+.message-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.message-actions:hover {
+  opacity: 1;
+}
+
+.like-btn, .dislike-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--main-fg);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: 16px;
+  padding: 0;
+}
+
+.like-btn:hover {
+  background: #22c55e;
+  color: white;
+  border-color: #22c55e;
+  transform: scale(1.1);
+}
+
+.dislike-btn:hover {
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
+  transform: scale(1.1);
+}
+
+.like-btn.selected, .like-btn.like-selected {
+  background: #22c55e;
+  color: white;
+  border-color: #22c55e;
+}
+
+.dislike-btn.selected, .dislike-btn.dislike-selected {
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
+}
+
+.like-btn:disabled, .dislike-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.copy-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--main-fg);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.copy-btn:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.rating-success {
+  color: #22c55e;
+  font-size: 12px;
+  font-weight: 500;
+  animation: fadeInOut 2s ease-in-out;
+}
+
+.rating-error {
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 500;
+  animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(5px); }
+  20%, 80% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-5px); }
+}
 button:focus-visible, input:focus-visible, select:focus-visible {
   /* outline: var(--focus-outline); */
 }
@@ -836,14 +935,126 @@ button:focus-visible, input:focus-visible, select:focus-visible {
   0% { left:0; }
   100% { left: -250px; }
 }
-@media (max-width: 800px) {
+/* Мобильные устройства */
+@media (max-width: 768px) {
   .chat-card {
-    max-width: 98vw;          
-  }
-  .main-content {
+    max-width: 100vw;
+    margin: 0;
+    border-radius: 0;
+    height: calc(100vh - 60px);
     display: flex;
-    justify-content: flex-end;
-    min-height: 59vh;
+    flex-direction: column;
+  }
+  
+  .main-content {
+    min-height: calc(100vh - 60px);
+    justify-content: stretch;
+  }
+  
+  .chat-history {
+    flex: 1;
+    padding: 15px 12px;
+    overflow-y: auto;
+  }
+  
+  .suggestions {
+    padding: 0 12px 10px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .suggestions button {
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 18px;
+    white-space: nowrap;
+    flex: 0 0 auto;
+  }
+  
+  .chat-input-panel {
+    padding: 12px;
+    gap: 8px;
+    border-top: 1px solid var(--border);
+    background: var(--main-bg);
+  }
+  
+  #chat-input {
+    font-size: 16px; /* Предотвращает зум на iOS */
+    padding: 12px 16px;
+    border-radius: 22px;
+    background: var(--gray);
+    border: 1px solid var(--border);
+  }
+  
+  .voice-btn, .add-btn, .send-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .navbar {
+    padding: 6px 10px;
+    height: 50px;
+  }
+  
+  .navbar-tags {
+    gap: 8px;
+    padding: 0 5px;
+  }
+  
+  .model-panel {
+    min-width: 120px;
+    font-size: 14px;
+  }
+  
+  .model-panel-title {
+    padding: 6px 10px;
+  }
+  
+  .menu-icon {
+    font-size: 24px;
+  }
+  
+  .bot-status {
+    font-size: 10px;
+  }
+  
+  /* Улучшения для сообщений */
+  .chat-bubble {
+    max-width: 85%;
+    margin-bottom: 16px;
+  }
+  
+  .bubble-user {
+    align-self: flex-end;
+    margin-left: 15%;
+  }
+  
+  .bubble-bot {
+    align-self: flex-start;
+    margin-right: 15%;
+  }
+  
+  .message-content {
+    padding: 12px 16px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  
+  .message-actions {
+    margin-top: 8px;
+    gap: 12px;
+  }
+  
+  .like-btn, .dislike-btn, .copy-btn {
+    padding: 6px;
+    min-width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    font-size: 16px;
   }
 }
 
@@ -852,28 +1063,136 @@ button:focus-visible, input:focus-visible, select:focus-visible {
 
 
 
+/* ========== Улучшенная адаптивность ========== */
+
+/* Планшет и большие мобильные устройства */
 @media (max-width: 1024px) {
   .main-content {
     display: flex;
-    justify-content: flex-end;
-    min-height: 59vh;
-}
-  .chat-card {min-width: unset;max-width: 100vw;border-radius: 11px;}
-  .footer-card { padding: 12px 8px; font-size: 0.98rem; border-radius: 9px; }
-  .chat-history {}
-  .navbar { padding: 0 6px; }
-  .chat-label-form-buttons{
-    border:none;
-    border-radius:none;
+    justify-content: center;
+    min-height: calc(100vh - 60px);
+    padding: 0;
   }
-  #chat-input{
-    background:#f7f7f7;
+  
+  .chat-card {
+    min-width: unset;
+    max-width: 95vw;
+    width: 100%;
+    border-radius: 12px;
+    margin: 10px;
+    box-shadow: var(--card-shadow);
+  }
+  
+  .navbar {
+    padding: 8px 12px;
+    height: 55px;
+  }
+  
+  .navbar-tags {
+    gap: 12px;
+    padding: 0 10px;
+  }
+  
+  .model-panel {
+    min-width: 140px;
+  }
+  
+  .bot-status {
+    font-size: 11px;
+  }
+  
+  .status-dot {
+    width: 7px;
+    height: 7px;
   }
 }
-@media (max-width: 400px) {
-  .chat-card, .footer-card { border-radius: 7px; }
-  .chat-history { padding: 5px 2px 4px 2px; }
-  .chat-input-panel {/* padding: 6px 2px; */gap: 0;}
+/* Маленькие мобильные устройства */
+@media (max-width: 480px) {
+  .navbar {
+    padding: 4px 8px;
+    height: 48px;
+  }
+  
+  .navbar-tags {
+    gap: 6px;
+    padding: 0 2px;
+  }
+  
+  .model-panel {
+    min-width: 100px;
+    font-size: 13px;
+  }
+  
+  .model-panel-title {
+    padding: 5px 8px;
+  }
+  
+  .chat-input-panel {
+    padding: 10px 8px;
+    gap: 6px;
+  }
+  
+  #chat-input {
+    font-size: 16px;
+    padding: 10px 14px;
+  }
+  
+  .voice-btn, .add-btn, .send-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+  }
+  
+  .suggestions button {
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 16px;
+  }
+  
+  .chat-bubble {
+    max-width: 90%;
+  }
+  
+  .message-content {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+  
+  .like-btn, .dislike-btn, .copy-btn {
+    min-width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    font-size: 14px;
+  }
+}
+
+/* Очень маленькие экраны */
+@media (max-width: 360px) {
+  .navbar-tags {
+    gap: 4px;
+  }
+  
+  .model-panel {
+    min-width: 85px;
+    font-size: 12px;
+  }
+  
+  .chat-input-panel {
+    padding: 8px 6px;
+  }
+  
+  .voice-btn, .add-btn, .send-btn {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .suggestions {
+    padding: 0 8px 8px;
+  }
+  
+  .chat-history {
+    padding: 10px 8px;
+  }
 }
 
 /* ========== Markdown стили для сообщений бота (ChatGPT-style) ========== */
