@@ -87,6 +87,114 @@ class MistralClient:
             logger.error(f"Unexpected error in Mistral client: {str(e)}")
             return self._get_fallback_response(language)
 
+    def get_response_with_system_prompt(self,
+                                        user_message: str,
+                                        context: str = "",
+                                        language: str = "ru",
+                                        custom_system_prompt: str = "") -> str:
+        """Get response using a custom system prompt"""
+        try:
+            # Use custom system prompt if provided, otherwise fall back to default
+            system_prompt = custom_system_prompt if custom_system_prompt else self.system_prompts.get(language, self.system_prompts['ru'])
+
+            messages = [{
+                "role": "system",
+                "content": system_prompt
+            }, {
+                "role":
+                "user",
+                "content":
+                f"Контекст из FAQ:\n{context}\n\nВопрос пользователя: {user_message}"
+            }]
+
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            }
+
+            data = {
+                "model": self.model,
+                "messages": messages,
+                "max_tokens": 500,
+                "temperature": 0.7
+            }
+
+            response = requests.post(f"{self.base_url}/chat/completions",
+                                     headers=headers,
+                                     json=data,
+                                     timeout=30)
+
+            if response.status_code == 200:
+                result = response.json()
+                return result['choices'][0]['message']['content'].strip()
+            else:
+                logger.error(
+                    f"Mistral API error: {response.status_code} - {response.text}"
+                )
+                return self._get_fallback_response(language)
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Request error to Mistral API: {str(e)}")
+            return self._get_smart_fallback_response(user_message, context,
+                                                     language)
+        except Exception as e:
+            logger.error(f"Unexpected error in Mistral client: {str(e)}")
+            return self._get_fallback_response(language)
+
+    def get_response_with_system_prompt(self,
+                                        user_message: str,
+                                        context: str = "",
+                                        language: str = "ru",
+                                        custom_system_prompt: str = "") -> str:
+        """Get response using a custom system prompt"""
+        try:
+            # Use custom system prompt if provided, otherwise fall back to default
+            system_prompt = custom_system_prompt if custom_system_prompt else self.system_prompts.get(language, self.system_prompts['ru'])
+
+            messages = [{
+                "role": "system",
+                "content": system_prompt
+            }, {
+                "role":
+                "user",
+                "content":
+                f"Контекст из FAQ:\n{context}\n\nВопрос пользователя: {user_message}"
+            }]
+
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            }
+
+            data = {
+                "model": self.model,
+                "messages": messages,
+                "max_tokens": 500,
+                "temperature": 0.7
+            }
+
+            response = requests.post(f"{self.base_url}/chat/completions",
+                                     headers=headers,
+                                     json=data,
+                                     timeout=30)
+
+            if response.status_code == 200:
+                result = response.json()
+                return result['choices'][0]['message']['content'].strip()
+            else:
+                logger.error(
+                    f"Mistral API error: {response.status_code} - {response.text}"
+                )
+                return self._get_fallback_response(language)
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Request error to Mistral API: {str(e)}")
+            return self._get_smart_fallback_response(user_message, context,
+                                                     language)
+        except Exception as e:
+            logger.error(f"Unexpected error in Mistral client: {str(e)}")
+            return self._get_fallback_response(language)
+
     def _get_smart_fallback_response(self,
                                      user_message: str,
                                      context: str,
